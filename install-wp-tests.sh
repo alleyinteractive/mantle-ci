@@ -150,6 +150,11 @@ install_db() {
 		fi
 	fi
 
+	# Drop the database before creating it.
+	set +e
+	mysqladmin drop $DB_NAME -f --user="$DB_USER" --password="$DB_PASS"$EXTRA
+	set -e
+
 	# create database
 	mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
 }
