@@ -1,0 +1,32 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'release*' # Push events to matching release*, i.e. release-1.0, release-20.15.10, release-2020-10-28-10-26-15
+
+name: Test Script
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        wordpress: ["latest", "trunk", "6.0"]
+        # php: [7.4, 8.0]
+    runs-on: ubuntu-latest
+    env:
+      CACHEDIR: /tmp/test-cache
+      WP_CORE_DIR: /tmp/wordpress
+      WP_VERSION: ${{ inputs.wordpress }}
+      WP_DB_HOST: 127.0.0.1
+      WP_DB_USER: root
+      WP_DB_PASSWORD: ''
+      WP_MULTISITE: ${{ inputs.multisite == true && 1 || 0 }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: "Run install-wp-tests.sh"
+        shell: bash
+        run: |
+          bash -s install-wp-tests.sh wordpress_unit_tests "$WP_DB_USER" "$WP_DB_PASSWORD" $WP_VERSION true
