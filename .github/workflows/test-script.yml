@@ -1,8 +1,10 @@
 on:
   push:
-    # Sequence of patterns matched against refs/tags
-    tags:
-      - 'release*' # Push events to matching release*, i.e. release-1.0, release-20.15.10, release-2020-10-28-10-26-15
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
 
 name: Test Script
 
