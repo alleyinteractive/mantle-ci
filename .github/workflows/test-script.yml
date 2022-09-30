@@ -14,11 +14,11 @@ jobs:
       matrix:
         wordpress: ["latest", "trunk", "6.0"]
     runs-on: ubuntu-latest
-    name: "Test Script ${{ inputs.wordpress }}"
+    name: "Test Script ${{ matrix.wordpress }}"
     env:
       CACHEDIR: /tmp/test-cache
       WP_CORE_DIR: /tmp/wordpress
-      WP_VERSION: ${{ inputs.wordpress }}
+      WP_VERSION: ${{ matrix.wordpress }}
       WP_DB_HOST: 127.0.0.1
       WP_DB_USER: root
       WP_DB_PASSWORD: 'password'
