@@ -31,11 +31,7 @@ jobs:
       - name: "Ensure Installation Does Not Exist"
         shell: bash
         run: |
-          set +e
-
-          bash bin/test-script.sh
-
-          set -e
+          bash bin/test-script.sh || true
 
           if [ $? -eq 0 ]; then
             echo "WordPress already installed before test!"
