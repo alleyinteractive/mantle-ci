@@ -23,14 +23,14 @@ mkdir -p $CACHEDIR
 download() {
 	# Check if the file has been downloaded in the last couple of hours.
 	if [[ -f $2 ]]; then
-		if test "`find $2 -mmin -240`"; then
+		if test "$(find $2 -mmin -240)"; then
 			return
 		fi
 	fi
 
-	if [ `which curl` ]; then
+	if [ $(which curl) ]; then
 		curl -s "$1" > "$2";
-	elif [ `which wget` ]; then
+	elif [ $(which wget) ]; then
 		wget -nv -O "$2" "$1"
 	fi
 }
@@ -90,7 +90,7 @@ install_wp() {
 				LATEST_VERSION=${WP_VERSION%??}
 			else
 				# otherwise, scan the releases and get the most up to date minor version of the major release
-				local VERSION_ESCAPED=`echo $WP_VERSION | sed 's/\./\\\\./g'`
+				local VERSION_ESCAPED=$(echo $WP_VERSION | sed 's/\./\\\\./g')
 				LATEST_VERSION=$(grep -o '"version":"'$VERSION_ESCAPED'[^"]*' $CACHEDIR/wp-latest.json | sed 's/"version":"//' | head -1)
 			fi
 			if [[ -z "$LATEST_VERSION" ]]; then
@@ -117,7 +117,7 @@ install_config() {
 	fi
 
 	if [ ! -f wp-tests-config.php ]; then
-		download https://develop.svn.wordpress.org/${WP_TESTS_TAG}/wp-tests-config-sample.php "$WP_CORE_DIR"/wp-tests-config.php
+		download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/main/wp-tests-config-sample.php "$WP_CORE_DIR"/wp-tests-config.php
 		# remove all forward slashes in the end
 		WP_CORE_DIR=$(echo $WP_CORE_DIR | sed "s:/\+$::")
 		sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" "$WP_CORE_DIR"/wp-tests-config.php
@@ -130,7 +130,7 @@ install_config() {
 
 install_db() {
 
-	if [ ${SKIP_DB_CREATE} = "true" ]; then
+	if [ "${SKIP_DB_CREATE}" = "true" ]; then
 		return
 	fi
 
