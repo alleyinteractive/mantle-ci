@@ -11,6 +11,7 @@ name: Test Script
 jobs:
   test:
     strategy:
+      fail-fast: true
       matrix:
         wordpress: ["latest", "trunk", "6.0"]
     runs-on: ubuntu-latest
@@ -27,6 +28,19 @@ jobs:
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
+      - name: "Ensure Installation Does Not Exist"
+        shell: bash
+        run: |
+          set +e
+
+          bash bin/test-script.sh
+
+          set -e
+
+          if [ $? -eq 0 ]; then
+            echo "WordPress already installed before test!"
+            exit 1
+          fi
       - name: "Run install-wp-tests.sh"
         shell: bash
         run: |
