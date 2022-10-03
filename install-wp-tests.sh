@@ -22,7 +22,7 @@ mkdir -p $CACHEDIR
 
 download() {
 	# Check if the file has been downloaded in the last couple of hours.
-	# If it hasn't been, use it instead of downloading it again.
+	# If it has been, use it instead of downloading it again.
 	if [[ -f $2 ]]; then
 		if test "$(find $2 -mmin -240)"; then
 			return

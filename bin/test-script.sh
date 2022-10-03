@@ -8,7 +8,7 @@ if [ ! -d "$WP_CORE_DIR" ]; then
 fi
 
 if [ ! -d "$WP_CORE_DIR/wp-admin" ]; then
-  echo "$WP_CORE_DIR does not exist."
+  echo "$WP_CORE_DIR/wp-admin does not exist."
   exit 1
 fi
 
