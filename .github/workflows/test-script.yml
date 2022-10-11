@@ -1,0 +1,38 @@
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  schedule:
+    - cron: '0 0 * * *'
+
+name: Test Script
+
+jobs:
+  test:
+    strategy:
+      fail-fast: true
+      matrix:
+        wordpress: ["latest", "trunk", "6.0"]
+    runs-on: ubuntu-latest
+    name: "Test Script ${{ matrix.wordpress }}"
+    env:
+      CACHEDIR: /tmp/test-cache
+      WP_CORE_DIR: /tmp/wordpress
+      WP_VERSION: ${{ matrix.wordpress }}
+      WP_DB_HOST: 127.0.0.1
+      WP_DB_USER: root
+      WP_DB_PASSWORD: 'password'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: "Run install-wp-tests.sh"
+        shell: bash
+        run: |
+          rm -rf $WP_CORE_DIR
+          bash install-wp-tests.sh wordpress_unit_tests "$WP_DB_USER" "$WP_DB_PASSWORD" "$WP_DB_HOST" $WP_VERSION true
+      - name: "Check Installation"
+        shell: bash
+        run: bash bin/test-script.sh
