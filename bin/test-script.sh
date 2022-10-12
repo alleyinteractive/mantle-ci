@@ -40,7 +40,7 @@ if ! grep -q "define( 'DB_HOST', '127.0.0.1' );" "$CONFIG_FILE"; then
   exit 1
 fi
 
-if ! grep -q "defined( 'ABSPATH' ) || define( 'ABSPATH', '$WP_CORE_DIR/' );" "$CONFIG_FILE"; then
+if ! grep -q "defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/' );" "$CONFIG_FILE"; then
   echo "ABSPATH is not set correctly."
   exit 1
 fi
