@@ -30,9 +30,9 @@ download() {
 	fi
 
 	if [ $(which curl) ]; then
-		curl -f -s "$1" > "$2" || echo "Download failed: $1" && exit 1;
+		curl -s "$1" > "$2";
 	elif [ $(which wget) ]; then
-		wget -nv -O "$2" "$1" || echo "Download failed: $1" && exit 1;
+		wget -nv -O "$2" "$1"
 	fi
 }
 
