@@ -31,11 +31,8 @@ jobs:
       - name: "Run install-wp-tests.sh"
         shell: bash
         run: |
-          set -o xtrace
           rm -rf $WP_CORE_DIR
           bash install-wp-tests.sh wordpress_unit_tests "$WP_DB_USER" "$WP_DB_PASSWORD" "$WP_DB_HOST" $WP_VERSION true
       - name: "Check Installation"
         shell: bash
-        run: |
-          set -o xtrace
-          bash bin/test-script.sh
+        run: bash bin/test-script.sh
