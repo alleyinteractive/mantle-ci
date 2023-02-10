@@ -137,6 +137,7 @@ install_sqlite() {
 	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-object-array.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-object-array.php"
 	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-pdo-driver.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-pdo-driver.php"
 	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-pdo-engine.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-pdo-engine.php"
+
 	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-pdo-user-defined-functions.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-pdo-user-defined-functions.php"
 	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/install-functions.php "$WP_CORE_DIR/wp-includes/sqlite/install-functions.php"
 }
@@ -144,3 +145,5 @@ install_sqlite() {
 install_wp
 install_config
 install_sqlite
+
+exit 0
