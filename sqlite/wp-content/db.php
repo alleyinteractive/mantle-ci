@@ -7,7 +7,7 @@
  */
 
 // Require the constants file.
-require_once __DIR__ . '/../sqlite/constants.php';
+require_once ABSPATH . WPINC . '/sqlite/constants.php';
 
 // Bail early if DATABASE_TYPE is not defined as sqlite.
 if ( ! defined( 'DATABASE_TYPE' ) || 'sqlite' !== DATABASE_TYPE ) {
