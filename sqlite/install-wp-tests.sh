@@ -145,5 +145,3 @@ install_sqlite() {
 install_wp
 install_config
 install_sqlite
-
-exit 0
