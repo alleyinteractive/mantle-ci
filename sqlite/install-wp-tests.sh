@@ -131,15 +131,15 @@ install_sqlite() {
 
 	mkdir -p "$WP_CORE_DIR/wp-includes/sqlite"
 
-	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/class-wp-sqlite-alter-query.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-alter-query.php"
-	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/class-wp-sqlite-create-query.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-create-query.php"
-	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/class-wp-sqlite-db.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-db.php"
-	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/class-wp-sqlite-object-array.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-object-array.php"
-	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/class-wp-sqlite-pdo-driver.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-pdo-driver.php"
-	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/class-wp-sqlite-pdo-engine.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-pdo-engine.php"
-	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/class-wp-sqlite-pdo-user-defined-functions.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-pdo-user-defined-functions.php"
-	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/constants.php "$WP_CORE_DIR/wp-includes/sqlite/constants.php"
-	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/install-functions.php "$WP_CORE_DIR/wp-includes/sqlite/install-functions.php"
+	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-alter-query.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-alter-query.php"
+	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-create-query.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-create-query.php"
+	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-db.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-db.php"
+	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-object-array.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-object-array.php"
+	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-pdo-driver.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-pdo-driver.php"
+	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-pdo-engine.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-pdo-engine.php"
+	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/class-wp-sqlite-pdo-user-defined-functions.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-pdo-user-defined-functions.php"
+	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/constants.php "$WP_CORE_DIR/wp-includes/sqlite/constants.php"
+	download https://raw.githubusercontent.com/WordPress/sqlite-database-integration/v1.0.3/wp-includes/sqlite/install-functions.php "$WP_CORE_DIR/wp-includes/sqlite/install-functions.php"
 }
 
 install_wp
