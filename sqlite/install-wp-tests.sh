@@ -129,6 +129,8 @@ install_config() {
 install_sqlite() {
 	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-content/db.php "$WP_CORE_DIR"/wp-content/db.php
 
+	mkdir -p "$WP_CORE_DIR/wp-includes/sqlite"
+
 	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/class-wp-sqlite-alter-query.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-alter-query.php"
 	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/class-wp-sqlite-create-query.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-create-query.php"
 	download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/$MANTLE_CI_TREE/sqlite/wp-includes/sqlite/class-wp-sqlite-db.php "$WP_CORE_DIR/wp-includes/sqlite/class-wp-sqlite-db.php"
@@ -142,3 +144,4 @@ install_sqlite() {
 
 install_wp
 install_config
+install_sqlite
