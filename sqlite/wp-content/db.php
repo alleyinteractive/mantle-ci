@@ -42,13 +42,13 @@ if ( ! extension_loaded( 'pdo_sqlite' ) ) {
 	);
 }
 
-require_once __DIR__ . '/../sqlite/class-wp-sqlite-pdo-user-defined-functions.php';
-require_once __DIR__ . '/../sqlite/class-wp-sqlite-pdo-engine.php';
-require_once __DIR__ . '/../sqlite/class-wp-sqlite-object-array.php';
-require_once __DIR__ . '/../sqlite/class-wp-sqlite-db.php';
-require_once __DIR__ . '/../sqlite/class-wp-sqlite-pdo-driver.php';
-require_once __DIR__ . '/../sqlite/class-wp-sqlite-create-query.php';
-require_once __DIR__ . '/../sqlite/class-wp-sqlite-alter-query.php';
-require_once __DIR__ . '/../sqlite/install-functions.php';
+require_once __DIR__ . '/../wp-includes/sqlite/class-wp-sqlite-pdo-user-defined-functions.php';
+require_once __DIR__ . '/../wp-includes/sqlite/class-wp-sqlite-pdo-engine.php';
+require_once __DIR__ . '/../wp-includes/sqlite/class-wp-sqlite-object-array.php';
+require_once __DIR__ . '/../wp-includes/sqlite/class-wp-sqlite-db.php';
+require_once __DIR__ . '/../wp-includes/sqlite/class-wp-sqlite-pdo-driver.php';
+require_once __DIR__ . '/../wp-includes/sqlite/class-wp-sqlite-create-query.php';
+require_once __DIR__ . '/../wp-includes/sqlite/class-wp-sqlite-alter-query.php';
+require_once __DIR__ . '/../wp-includes/sqlite/install-functions.php';
 
 $GLOBALS['wpdb'] = new WP_SQLite_DB();
