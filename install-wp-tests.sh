@@ -133,9 +133,15 @@ download() {
 	fi
 
 	if [ "$(which curl)" ]; then
-		curl -s "$1" > "$2";
+		curl -f -s "$1" > "$2"
 	elif [ "$(which wget)" ]; then
 		wget -nv -O "$2" "$1"
+	fi
+
+	# Exit if the last command failed.
+	if [ $? -ne 0 ]; then
+		echo "Downloading $1 failed"
+		exit 1
 	fi
 }
 
