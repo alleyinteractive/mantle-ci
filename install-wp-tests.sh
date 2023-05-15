@@ -110,6 +110,7 @@ if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
 	echo "SKIP_DB_CREATE: ${SKIP_DB_CREATE}"
 	echo "INSTALL_VIP: ${INSTALL_VIP}"
 	echo "INSTALL_OBJECT_CACHE: ${INSTALL_OBJECT_CACHE}"
+	echo "WP_INSTALL_CORE_TEST_SUITE: ${WP_INSTALL_CORE_TEST_SUITE}"
 fi
 
 # Create the cache directory if it doesn't exist.
@@ -229,10 +230,12 @@ install_config() {
 }
 
 install_test_suite() {
-	if [ "$INSTALL_CORE_TEST_SUITE" != "true" ]; then
-		yellow "Skipping installing core test suite..."
+	if [ "$WP_INSTALL_CORE_TEST_SUITE" != "true" ]; then
+		yellow "Skipping installing core test suite"
 		return
 	fi
+
+	green "Installing core test suite to $WP_TESTS_DIR"
 
 	# portable in-place argument for both GNU sed and Mac OSX sed
 	if [[ $(uname -s) == 'Darwin' ]]; then
@@ -264,7 +267,7 @@ install_test_suite() {
 
 install_db() {
 	if [ "${SKIP_DB_CREATE}" = "true" ]; then
-		yellow "Skipping database creation..."
+		yellow "Skipping database creation"
 		return
 	fi
 
@@ -295,11 +298,11 @@ install_db() {
 
 install_mu_plugins() {
 	if [ "$INSTALL_MU_PLUGINS" != "true" ]; then
-		yellow "Skipping installing mu-plugins..."
+		yellow "Skipping installing mu-plugins"
 		return
 	fi
 
-	green "Cloning VIP Go mu-plugins..."
+	green "Cloning VIP Go mu-plugins"
 
 	cd "${WP_CORE_DIR}/wp-content/"
 
@@ -310,7 +313,7 @@ install_mu_plugins() {
 					--depth=1 \
 					https://github.com/Automattic/vip-go-mu-plugins-built.git mu-plugins
 	else
-			yellow "VIP Go mu-plugins already exists, attempting to update..."
+			yellow "VIP Go mu-plugins already exists, attempting to update"
 			cd mu-plugins
 			git pull
 			cd ..
@@ -319,13 +322,13 @@ install_mu_plugins() {
 
 install_object_cache() {
 	if [ "$INSTALL_OBJECT_CACHE" != "true" ]; then
-		yellow "Skipping installing object-cache.php..."
+		yellow "Skipping installing object-cache.php"
 		return
 	fi
 
 	# Check if the file exists.
 	if [ -f "${WP_CORE_DIR}/wp-content/object-cache.php" ]; then
-		yellow "object-cache.php already exists, skipping..."
+		yellow "object-cache.php already exists, skipping"
 		return
 	fi
 
