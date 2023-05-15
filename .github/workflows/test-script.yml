@@ -29,6 +29,5 @@ jobs:
       - name: "Check Installation"
         shell: bash
         run: |
-          pwd
-          ls -al
+          ls -al bin
           bash bin/test-script.sh
