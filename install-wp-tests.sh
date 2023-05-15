@@ -7,8 +7,8 @@
 # WordPress/wp-cli install-wp-tests.sh script with a few modifications:
 #
 # 1. By default it will not install the core test suite. This means that we will
-#    only install WordPress to WP_CORE_DIR but will not install the test suite
-#    to WP_TESTS_DIR. This can be configured by CONDITION.
+#    only install WordPress to `WP_CORE_DIR` but will not install the test suite
+#    to `WP_TESTS_DIR`. This can be configured by setting `WP_INSTALL_CORE_TEST_SUITE` to true.
 # 2. It will attempt to cache remote data requests for 4 hours. This can be
 #    configured by the `CACHEDIR` environment variable for the location of the cache
 #    directory. It can also be disabled by setting `CACHEDIR` to false.
@@ -43,6 +43,10 @@
 # 	WP_MULTISITE: Whether or not to install WordPress as multisite.
 # 		Defaults to false.
 # 	WP_INSTALL_CORE_TEST_SUITE: Whether or not to install the WordPress core test suite.
+# 		Defaults to false.
+# 	WP_TESTS_TAG: The tag of the WordPress core test suite to install.
+# 		Defaults to "trunk".
+# 	INSTALL_WP_TEST_DEBUG: Whether or not to dump all variables for debugging.
 # 		Defaults to false.
 #
 # Example:
@@ -91,7 +95,7 @@ INSTALL_OBJECT_CACHE=$(boolean "${8:-true}" "INSTALL_OBJECT_CACHE")
 
 # Environment variables with defaults.
 CACHEDIR=${CACHEDIR:-/tmp}
-CACHEDIR=$(echo "$CACHEDIR" | sed -e "s/\/$//")
+CACHEDIR=$(echo "$CACHEDIR" | sed -e "s/\/$//") # Remove trailing slash if present.
 WP_CORE_DIR=${WP_CORE_DIR:-"${CACHEDIR}/wordpress"}
 WP_TESTS_DIR=${WP_TESTS_DIR:-/tmp/wordpress-tests-lib} # Only used with core test suite.
 WP_MULTISITE=${WP_MULTISITE:-0}
