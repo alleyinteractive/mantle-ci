@@ -97,6 +97,7 @@ WP_TESTS_DIR=${WP_TESTS_DIR:-/tmp/wordpress-tests-lib} # Only used with core tes
 WP_MULTISITE=${WP_MULTISITE:-0}
 WP_INSTALL_CORE_TEST_SUITE=$(boolean "${WP_INSTALL_CORE_TEST_SUITE:-false}" "WP_INSTALL_CORE_TEST_SUITE")
 
+# Allow the script to dump all variables for debugging.
 if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
 	echo "WP_VERSION: ${WP_VERSION}"
 	echo "WP_CORE_DIR: ${WP_CORE_DIR}"
