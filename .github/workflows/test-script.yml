@@ -30,9 +30,7 @@ jobs:
           fetch-depth: 0
       - name: "Run install-wp-tests.sh"
         shell: bash
-        run: |
-          rm -rf $WP_CORE_DIR || true
-          bash install-wp-tests.sh wordpress_unit_tests "$WP_DB_USER" "$WP_DB_PASSWORD" "$WP_DB_HOST" $WP_VERSION true true true
+        run: bash install-wp-tests.sh wordpress_unit_tests "$WP_DB_USER" "$WP_DB_PASSWORD" "$WP_DB_HOST" $WP_VERSION true true true
       - name: "Check Installation"
         shell: bash
         run: bash bin/test-script.sh
