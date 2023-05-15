@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 # Test that the script ran correctly and properly installed WordPress.
 
 if [ ! -d "$WP_CORE_DIR" ]; then
@@ -42,6 +44,16 @@ fi
 
 if ! grep -q "defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/' );" "$CONFIG_FILE"; then
   echo "ABSPATH is not set correctly."
+  exit 1
+fi
+
+if [ ! -d "$WP_CORE_DIR/wp-content/mu-plugins/.git" ]; then
+  echo "$WP_CORE_DIR/wp-content/mu-plugins/.git (https://github.com/Automattic/vip-go-mu-plugins-built.git) does not exist."
+  exit 1
+fi
+
+if [ ! -f "$WP_CORE_DIR/wp-content/object-cache.php" ]; then
+  echo "$WP_CORE_DIR/wp-content/object-cache.php does not exist."
   exit 1
 fi
 

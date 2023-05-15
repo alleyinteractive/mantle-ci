@@ -91,7 +91,7 @@ INSTALL_OBJECT_CACHE=$(boolean "${8:-true}" "INSTALL_OBJECT_CACHE")
 
 # Environment variables with defaults.
 CACHEDIR=${CACHEDIR:-/tmp}
-CACHEDIR=$(echo $CACHEDIR | sed -e "s/\/$//")
+CACHEDIR=$(echo "$CACHEDIR" | sed -e "s/\/$//")
 WP_CORE_DIR=${WP_CORE_DIR:-"${CACHEDIR}/wordpress"}
 WP_TESTS_DIR=${WP_TESTS_DIR:-/tmp/wordpress-tests-lib} # Only used with core test suite.
 WP_MULTISITE=${WP_MULTISITE:-0}
@@ -121,7 +121,7 @@ download() {
 	# Check if the file has been downloaded in the last couple of hours.
 	# If it has been, use it instead of downloading it again.
 	if [[ -f $2 ]]; then
-		if test "$(find $2 -mmin -240)"; then
+		if test "$(find "$2" -mmin -240)"; then
 			if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
 				yellow "Using cached $2"
 			fi
@@ -130,9 +130,9 @@ download() {
 		fi
 	fi
 
-	if [ $(which curl) ]; then
+	if [ "$(which curl)" ]; then
 		curl -s "$1" > "$2";
-	elif [ $(which wget) ]; then
+	elif [ "$(which wget)" ]; then
 		wget -nv -O "$2" "$1"
 	fi
 }
@@ -165,20 +165,20 @@ fi
 set -e
 
 install_wp() {
-	if [ -d $WP_CORE_DIR ]; then
-		if [ -f $WP_CORE_DIR/wp-load.php ]; then
+	if [ -d "$WP_CORE_DIR" ]; then
+		if [ -f "$WP_CORE_DIR"/wp-load.php ]; then
 			echo "WordPress already installed at [$WP_CORE_DIR]"
 			return
 		fi
 	fi
 
-	mkdir -p $WP_CORE_DIR
+	mkdir -p "$WP_CORE_DIR"
 
 	if [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
-		mkdir -p $CACHEDIR/wordpress-nightly
-		download https://wordpress.org/nightly-builds/wordpress-latest.zip  $CACHEDIR/wordpress-nightly/wordpress-nightly.zip
-		unzip -q $CACHEDIR/wordpress-nightly/wordpress-nightly.zip -d $CACHEDIR/wordpress-nightly/
-		mv $CACHEDIR/wordpress-nightly/wordpress/* $WP_CORE_DIR
+		mkdir -p "$CACHEDIR"/wordpress-nightly
+		download "https://wordpress.org/nightly-builds/wordpress-latest.zip"  "$CACHEDIR/wordpress-nightly/wordpress-nightly.zip"
+		unzip -q "$CACHEDIR/wordpress-nightly/wordpress-nightly.zip" -d "$CACHEDIR/wordpress-nightly/"
+		mv "$CACHEDIR"/wordpress-nightly/wordpress/* $WP_CORE_DIR
 	else
 		if [ $WP_VERSION == 'latest' ]; then
 			local ARCHIVE_NAME='latest'
@@ -331,11 +331,8 @@ install_object_cache() {
 
 	# Check if the file was downloaded by mu-plugins.
 	if [ -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" ]; then
-		yellow "object-cache.php already exists in mu-plugins, copying..."
 		cp -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
-		return
 	else
-		yellow "object-cache.php does not exist in mu-plugins, downloading..."
 		download "https://raw.githubusercontent.com/Automattic/vip-go-mu-plugins-built/HEAD/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
 	fi
 }
@@ -347,4 +344,4 @@ install_db
 install_mu_plugins
 install_object_cache
 
-green "Ready to test ${WP_CORE_DIR}/wp-content/..."
+green "Ready to test ${WP_CORE_DIR}/wp-content/ 🚀"
