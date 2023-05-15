@@ -28,6 +28,4 @@ jobs:
         run: bash install-wp-tests.sh wordpress_unit_tests root password 127.0.0.1 "$WP_VERSION" true true true
       - name: "Check Installation"
         shell: bash
-        run: |
-          ls -al bin
-          bash bin/test-script.sh
+        run: bash bin/test-script.sh

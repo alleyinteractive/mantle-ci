@@ -47,8 +47,8 @@ if ! grep -q "defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/' );" "$CON
   exit 1
 fi
 
-if [ ! -d "$WP_CORE_DIR/wp-content/mu-plugins/.git" ]; then
-  echo "$WP_CORE_DIR/wp-content/mu-plugins/.git (https://github.com/Automattic/vip-go-mu-plugins-built.git) does not exist."
+if [ ! -d "$WP_CORE_DIR/wp-content/mu-plugins" ]; then
+  echo "$WP_CORE_DIR/wp-content/mu-plugins (https://github.com/Automattic/vip-go-mu-plugins-built.git) does not exist."
   exit 1
 fi
 
