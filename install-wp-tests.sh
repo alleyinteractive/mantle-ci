@@ -1,30 +1,131 @@
 #!/usr/bin/env bash
+#
+# Install WordPress Tests for Development
+#
+# Primarily geared for development with Mantle framerwork/Mantle Testkit but also
+# supported installing the core WordPress test suite as well. Mirrors the
+# WordPress/wp-cli install-wp-tests.sh script with a few modifications:
+#
+# 1. By default it will not install the core test suite. This means that we will
+#    only install WordPress to WP_CORE_DIR but will not install the test suite
+#    to WP_TESTS_DIR. This can be configured by CONDITION.
+# 2. It will attempt to cache remote data requests for 4 hours. This can be
+#    configured by the `CACHEDIR` environment variable for the location of the cache
+#    directory. It can also be disabled by setting `CACHEDIR` to false.
+# 3. The script can optionally install Automattic's vip-mu-plugins-built as well as the
+#    object-cache.php file for Memcached support. This can be configured by the
+#    `INSTALL_VIP` environment variable (disabled by default) and the
+#    `INSTALL_MEMCACHED` environment variable (enabled by default).
+#
+# Usage:
+#
+# 	install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-mu-plugins> <install-memcached>
+#
+# Arguments (all are optional but must be in order and cannot be skipped):
+#
+# 	1. Database Name: defaults to "wordpress_unit_tests"
+# 	2. Database User: defaults to "root"
+# 	3. Database Password: defaults to ""
+# 	4. Database Host: defaults to "localhost"
+# 	5. WordPress Version: defaults to "latest"
+# 	6. Skip Database Creation: defaults to false
+# 	7. Install Automattic's vip-mu-plugins-built: defaults to false
+# 	8. Install Memcached: defaults to false
+#
+# Environment Variables:
+#
+# 	CACHEDIR: The location of the cache directory.
+# 		Defaults to /tmp.
+# 	WP_CORE_DIR: The location of the WordPress core directory.
+# 		Defaults to /tmp/wordpress.
+# 	WP_TESTS_DIR: The location of the WordPress core test suite directory.
+# 		Defaults to /tmp/wordpress-tests-lib. Not used if INSTALL_CORE_TEST_SUITE is not true.
+# 	WP_MULTISITE: Whether or not to install WordPress as multisite.
+# 		Defaults to false.
+# 	WP_INSTALL_CORE_TEST_SUITE: Whether or not to install the WordPress core test suite.
+# 		Defaults to false.
+#
+# Example:
+#
+# 	install-wp-tests.sh wordpress_unit_tests root '' localhost latest false false false
 
-if [ $# -lt 3 ]; then
-	echo "usage: $0 <db-name> <db-user> <db-pass> [db-host] [wp-version] [skip-database-creation]"
-	exit 1
+set -e
+
+# Convenient functions for printing colored text
+function green {
+  # green text to stdout
+	echo "$@" | sed $'s,.*,\e[32m&\e[m,' | xargs -0 printf
+}
+
+function yellow {
+	# yellow text to stderr
+	echo "$@" | sed $'s,.*,\e[33m&\e[m,' | >&2 xargs -0 printf
+}
+
+function red {
+	# red text to stderr
+	echo "$@" | sed $'s,.*,\e[31m&\e[m,' | >&2 xargs -0 printf
+}
+
+# Handle true/false values
+function boolean() {
+  if [[ "$1" =~ ^(true|yes|on|1)$ ]]; then
+    echo "true"
+  elif [[ "$1" =~ ^(false|no|off|0)$ ]]; then
+    echo "false"
+  else
+    red "Error: Invalid boolean value for '$2': '$1'. Must be 'true' or 'false'."
+		exit 1
+  fi
+}
+
+# Arguments passed to the script directly with defaults.
+DB_NAME="${1:-wordpress_unit_tests}"
+DB_USER="${2:-root}"
+DB_PASS="${3:-}"
+DB_HOST="${4:-localhost}"
+WP_VERSION="${5:-latest}"
+SKIP_DB_CREATE=$(boolean "${6:-false}" "SKIP_DB_CREATE")
+INSTALL_MU_PLUGINS=$(boolean "${7:-false}" "INSTALL_MU_PLUGINS")
+INSTALL_OBJECT_CACHE=$(boolean "${8:-true}" "INSTALL_OBJECT_CACHE")
+
+# Environment variables with defaults.
+CACHEDIR=${CACHEDIR:-/tmp}
+CACHEDIR=$(echo $CACHEDIR | sed -e "s/\/$//")
+WP_CORE_DIR=${WP_CORE_DIR:-"${CACHEDIR}/wordpress"}
+WP_TESTS_DIR=${WP_TESTS_DIR:-/tmp/wordpress-tests-lib} # Only used with core test suite.
+WP_MULTISITE=${WP_MULTISITE:-0}
+WP_INSTALL_CORE_TEST_SUITE=$(boolean "${WP_INSTALL_CORE_TEST_SUITE:-false}" "WP_INSTALL_CORE_TEST_SUITE")
+
+if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
+	echo "WP_VERSION: ${WP_VERSION}"
+	echo "WP_CORE_DIR: ${WP_CORE_DIR}"
+	echo "CACHEDIR: ${CACHEDIR}"
+	echo "WP_TESTS_DIR: ${WP_TESTS_DIR}"
+	echo "WP_MULTISITE: ${WP_MULTISITE}"
+	echo "DB_NAME: ${DB_NAME}"
+	echo "DB_USER: ${DB_USER}"
+	echo "DB_PASS: ${DB_PASS}"
+	echo "DB_HOST: ${DB_HOST}"
+	echo "SKIP_DB_CREATE: ${SKIP_DB_CREATE}"
+	echo "INSTALL_VIP: ${INSTALL_VIP}"
+	echo "INSTALL_OBJECT_CACHE: ${INSTALL_OBJECT_CACHE}"
 fi
 
-DB_NAME=$1
-DB_USER=$2
-DB_PASS=$3
-DB_HOST=${4-localhost}
-WP_VERSION=${5-latest}
-SKIP_DB_CREATE=${6-false}
-
-CACHEDIR=${CACHEDIR-/tmp}
-CACHEDIR=$(echo $CACHEDIR | sed -e "s/\/$//")
-
-WP_CORE_DIR=${WP_CORE_DIR-$CACHEDIR/wordpress/}
-
 # Create the cache directory if it doesn't exist.
-mkdir -p $CACHEDIR
+if [[ ! -d $CACHEDIR ]]; then
+	mkdir -p "$CACHEDIR" || red "Could not create directory $CACHEDIR" && exit 1
+fi
 
 download() {
 	# Check if the file has been downloaded in the last couple of hours.
 	# If it has been, use it instead of downloading it again.
 	if [[ -f $2 ]]; then
 		if test "$(find $2 -mmin -240)"; then
+			if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
+				yellow "Using cached $2"
+			fi
+
 			return
 		fi
 	fi
@@ -36,11 +137,9 @@ download() {
 	fi
 }
 
-if [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+\-(beta|RC)[0-9]+$ ]]; then
-	WP_BRANCH=${WP_VERSION%\-*}
-	WP_TESTS_TAG="branches/$WP_BRANCH"
+set +e
 
-elif [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
+if [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
 	WP_TESTS_TAG="branches/$WP_VERSION"
 elif [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
 	if [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0] ]]; then
@@ -118,7 +217,7 @@ install_config() {
 	fi
 
 	if [ ! -f wp-tests-config.php ]; then
-		download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/main/wp-tests-config-sample.php "$WP_CORE_DIR"/wp-tests-config.php
+		download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/wp-tests-config-sample.php "$WP_CORE_DIR"/wp-tests-config.php
 		# remove all forward slashes in the end
 		WP_CORE_DIR=$(echo $WP_CORE_DIR | sed "s:/\+$::")
 		sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" "$WP_CORE_DIR"/wp-tests-config.php
@@ -129,9 +228,43 @@ install_config() {
 	fi
 }
 
-install_db() {
+install_test_suite() {
+	if [ "$INSTALL_CORE_TEST_SUITE" != "true" ]; then
+		yellow "Skipping installing core test suite..."
+		return
+	fi
 
+	# portable in-place argument for both GNU sed and Mac OSX sed
+	if [[ $(uname -s) == 'Darwin' ]]; then
+		local ioption='-i .bak'
+	else
+		local ioption='-i'
+	fi
+
+	# set up testing suite if it doesn't yet exist
+	if [ ! -d $WP_TESTS_DIR ]; then
+		# set up testing suite
+		mkdir -p $WP_TESTS_DIR
+		svn co --quiet https://develop.svn.wordpress.org/${WP_TESTS_TAG}/tests/phpunit/includes/ $WP_TESTS_DIR/includes
+		svn co --quiet https://develop.svn.wordpress.org/${WP_TESTS_TAG}/tests/phpunit/data/ $WP_TESTS_DIR/data
+	fi
+
+	if [ ! -f wp-tests-config.php ]; then
+		download https://develop.svn.wordpress.org/${WP_TESTS_TAG}/wp-tests-config-sample.php "$WP_TESTS_DIR"/wp-tests-config.php
+		# remove all forward slashes in the end
+		WP_CORE_DIR=$(echo $WP_CORE_DIR | sed "s:/\+$::")
+		sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" "$WP_TESTS_DIR"/wp-tests-config.php
+		sed $ioption "s/youremptytestdbnamehere/$DB_NAME/" "$WP_TESTS_DIR"/wp-tests-config.php
+		sed $ioption "s/yourusernamehere/$DB_USER/" "$WP_TESTS_DIR"/wp-tests-config.php
+		sed $ioption "s/yourpasswordhere/$DB_PASS/" "$WP_TESTS_DIR"/wp-tests-config.php
+		sed $ioption "s|localhost|${DB_HOST}|" "$WP_TESTS_DIR"/wp-tests-config.php
+	fi
+}
+
+
+install_db() {
 	if [ "${SKIP_DB_CREATE}" = "true" ]; then
+		yellow "Skipping database creation..."
 		return
 	fi
 
@@ -160,6 +293,58 @@ install_db() {
 	mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
 }
 
+install_mu_plugins() {
+	if [ "$INSTALL_MU_PLUGINS" != "true" ]; then
+		yellow "Skipping installing mu-plugins..."
+		return
+	fi
+
+	green "Cloning VIP Go mu-plugins..."
+
+	cd "${WP_CORE_DIR}/wp-content/"
+
+	# Checkout VIP Go mu-plugins to mu-plugins
+	if [ ! -d "mu-plugins" ]; then
+			git clone \
+					--recursive \
+					--depth=1 \
+					https://github.com/Automattic/vip-go-mu-plugins-built.git mu-plugins
+	else
+			yellow "VIP Go mu-plugins already exists, attempting to update..."
+			cd mu-plugins
+			git pull
+			cd ..
+	fi
+}
+
+install_object_cache() {
+	if [ "$INSTALL_OBJECT_CACHE" != "true" ]; then
+		yellow "Skipping installing object-cache.php..."
+		return
+	fi
+
+	# Check if the file exists.
+	if [ -f "${WP_CORE_DIR}/wp-content/object-cache.php" ]; then
+		yellow "object-cache.php already exists, skipping..."
+		return
+	fi
+
+	# Check if the file was downloaded by mu-plugins.
+	if [ -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" ]; then
+		yellow "object-cache.php already exists in mu-plugins, copying..."
+		cp -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+		return
+	else
+		yellow "object-cache.php does not exist in mu-plugins, downloading..."
+		download "https://raw.githubusercontent.com/Automattic/vip-go-mu-plugins-built/HEAD/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+	fi
+}
+
 install_wp
+install_test_suite
 install_config
 install_db
+install_mu_plugins
+install_object_cache
+
+green "Ready to test ${WP_CORE_DIR}/wp-content/..."
