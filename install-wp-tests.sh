@@ -345,12 +345,15 @@ install_object_cache() {
 		return
 	fi
 
-	# Check if the file was downloaded by mu-plugins.
-	if [ -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" ]; then
-		cp -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
-	else
-		download "https://raw.githubusercontent.com/Automattic/vip-go-mu-plugins-built/HEAD/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
-	fi
+	# Download the object cache drop-in.
+	download "https://raw.githubusercontent.com/Automattic/wp-memcached/HEAD/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+
+	# Disabled pending deliberation.
+	# # Check if the file was downloaded by mu-plugins.
+	# if [ -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" ]; then
+	# 	cp -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+	# else
+	# fi
 }
 
 install_wp
