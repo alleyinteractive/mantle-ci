@@ -100,6 +100,7 @@ WP_CORE_DIR=${WP_CORE_DIR:-"${CACHEDIR}/wordpress"}
 WP_TESTS_DIR=${WP_TESTS_DIR:-/tmp/wordpress-tests-lib} # Only used with core test suite.
 WP_MULTISITE=${WP_MULTISITE:-0}
 WP_INSTALL_CORE_TEST_SUITE=$(boolean "${WP_INSTALL_CORE_TEST_SUITE:-false}" "WP_INSTALL_CORE_TEST_SUITE")
+INSTALL_WP_TEST_DEBUG=$(boolean "${INSTALL_WP_TEST_DEBUG:-false}" "INSTALL_WP_TEST_DEBUG")
 
 set +e
 
@@ -186,6 +187,8 @@ install_wp() {
 		fi
 	fi
 
+	green "Installing WordPress at [$WP_CORE_DIR]"
+
 	mkdir -p "$WP_CORE_DIR"
 
 	if [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
@@ -229,6 +232,8 @@ install_config() {
 	else
 		local ioption='-i'
 	fi
+
+	green "Installing wp-tests-config.php"
 
 	if [ ! -f wp-tests-config.php ]; then
 		download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/wp-tests-config-sample.php "$WP_CORE_DIR"/wp-tests-config.php
@@ -284,6 +289,8 @@ install_db() {
 		return
 	fi
 
+	green "Creating database $DB_NAME"
+
 	# parse DB_HOST for port or socket references
 	local PARTS=(${DB_HOST//\:/ })
 	local DB_HOSTNAME=${PARTS[0]};
@@ -321,15 +328,15 @@ install_mu_plugins() {
 
 	# Checkout VIP Go mu-plugins to mu-plugins
 	if [ ! -d "mu-plugins" ]; then
-			git clone \
-					--recursive \
-					--depth=1 \
-					https://github.com/Automattic/vip-go-mu-plugins-built.git mu-plugins
+		git clone \
+			--recursive \
+			--depth=1 \
+			https://github.com/Automattic/vip-go-mu-plugins-built.git mu-plugins
 	else
-			yellow "VIP Go mu-plugins already exists, attempting to update"
-			cd mu-plugins
-			git pull
-			cd ..
+		yellow "VIP Go mu-plugins already exists, attempting to update"
+		cd mu-plugins
+		git pull
+		cd ..
 	fi
 }
 
@@ -345,15 +352,12 @@ install_object_cache() {
 		return
 	fi
 
-	# Download the object cache drop-in.
-	download "https://raw.githubusercontent.com/Automattic/wp-memcached/HEAD/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+	green "Installing object-cache.php"
 
-	# Disabled pending deliberation.
-	# # Check if the file was downloaded by mu-plugins.
-	# if [ -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" ]; then
-	# 	cp -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
-	# else
-	# fi
+	# Download the object cache drop-in.
+	# TODO: use the mu-plugins object-cache.php instead if this is a VIP project
+	# (requires setting the VIP_GO_APP_ENVIRONMENT constant).
+	download "https://raw.githubusercontent.com/Automattic/wp-memcached/HEAD/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
 }
 
 install_wp
