@@ -194,29 +194,29 @@ install_wp() {
 		unzip -q "$CACHEDIR/wordpress-nightly/wordpress-nightly.zip" -d "$CACHEDIR/wordpress-nightly/"
 		mv "$CACHEDIR/wordpress-nightly/wordpress/"* "$WP_CORE_DIR"
 	else
-		if [ $WP_VERSION == 'latest' ]; then
-			local ARCHIVE_NAME='latest'
+		if [ "$WP_VERSION" == 'latest' ]; then
+			ARCHIVE_NAME='latest'
 		elif [[ $WP_VERSION =~ [0-9]+\.[0-9]+ ]]; then
 			# https serves multiple offers, whereas http serves single.
-			download https://api.wordpress.org/core/version-check/1.7/ $CACHEDIR/wp-latest.json
+			download "https://api.wordpress.org/core/version-check/1.7/" "$CACHEDIR/wp-latest.json"
 			if [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0] ]]; then
 				# version x.x.0 means the first release of the major version, so strip off the .0 and download version x.x
 				LATEST_VERSION=${WP_VERSION%??}
 			else
 				# otherwise, scan the releases and get the most up to date minor version of the major release
-				local VERSION_ESCAPED=$(echo $WP_VERSION | sed 's/\./\\\\./g')
-				LATEST_VERSION=$(grep -o '"version":"'$VERSION_ESCAPED'[^"]*' $CACHEDIR/wp-latest.json | sed 's/"version":"//' | head -1)
+				VERSION_ESCAPED=$(echo "$WP_VERSION" | sed 's/\./\\\\./g')
+				LATEST_VERSION=$(grep -o '"version":"'"$VERSION_ESCAPED"'[^"]*' "$CACHEDIR/wp-latest.json" | sed 's/"version":"//' | head -1)
 			fi
 			if [[ -z "$LATEST_VERSION" ]]; then
-				local ARCHIVE_NAME="wordpress-$WP_VERSION"
+				ARCHIVE_NAME="wordpress-$WP_VERSION"
 			else
-				local ARCHIVE_NAME="wordpress-$LATEST_VERSION"
+				ARCHIVE_NAME="wordpress-$LATEST_VERSION"
 			fi
 		else
-			local ARCHIVE_NAME="wordpress-$WP_VERSION"
+			ARCHIVE_NAME="wordpress-$WP_VERSION"
 		fi
-		download https://wordpress.org/${ARCHIVE_NAME}.tar.gz  $CACHEDIR/wordpress.tar.gz
-		tar --strip-components=1 -zxmf $CACHEDIR/wordpress.tar.gz -C $WP_CORE_DIR
+		download "https://wordpress.org/${ARCHIVE_NAME}.tar.gz" "$CACHEDIR/wordpress.tar.gz"
+		tar --strip-components=1 -zxmf "$CACHEDIR/wordpress.tar.gz" -C "$WP_CORE_DIR"
 	fi
 
 	download https://raw.githubusercontent.com/markoheijnen/wp-mysqli/master/db.php $WP_CORE_DIR/wp-content/db.php
@@ -235,7 +235,7 @@ install_config() {
 	if [ ! -f wp-tests-config.php ]; then
 		download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/wp-tests-config-sample.php "$WP_CORE_DIR"/wp-tests-config.php
 		# remove all forward slashes in the end
-		WP_CORE_DIR=$(echo $WP_CORE_DIR | sed "s:/\+$::")
+		WP_CORE_DIR=$(echo "$WP_CORE_DIR" | sed "s:/\+$::")
 		sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" "$WP_CORE_DIR"/wp-tests-config.php
 		sed $ioption "s/youremptytestdbnamehere/$DB_NAME/" "$WP_CORE_DIR"/wp-tests-config.php
 		sed $ioption "s/yourusernamehere/$DB_USER/" "$WP_CORE_DIR"/wp-tests-config.php
@@ -260,16 +260,15 @@ install_test_suite() {
 	fi
 
 	# set up testing suite if it doesn't yet exist
-	if [ ! -d $WP_TESTS_DIR ]; then
+	if [ ! -d "$WP_TESTS_DIR" ]; then
 		# set up testing suite
-		mkdir -p $WP_TESTS_DIR
+		mkdir -p "$WP_TESTS_DIR"
 		svn co --quiet "https://develop.svn.wordpress.org/$WP_TESTS_TAG/tests/phpunit/includes/" "$WP_TESTS_DIR/includes"
 		svn co --quiet "https://develop.svn.wordpress.org/$WP_TESTS_TAG/tests/phpunit/data/" "$WP_TESTS_DIR/data"
 	fi
 
 	if [ ! -f wp-tests-config.php ]; then
-		download https://develop.svn.wordpress.org/${WP_TESTS_TAG}/wp-tests-config-sample.php "$WP_TESTS_DIR"/wp-tests-config.php
-		# remove all forward slashes in the end
+		download "https://develop.svn.wordpress.org/$WP_TESTS_TAG/wp-tests-config-sample.php" "$WP_TESTS_DIR"/wp-tests-config.php
 		WP_CORE_DIR=$(echo $WP_CORE_DIR | sed "s:/\+$::")
 		sed "$ioption" "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" "$WP_TESTS_DIR"/wp-tests-config.php
 		sed "$ioption" "s/youremptytestdbnamehere/$DB_NAME/" "$WP_TESTS_DIR"/wp-tests-config.php
