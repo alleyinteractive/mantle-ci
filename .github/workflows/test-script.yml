@@ -11,7 +11,7 @@ name: Test Script
 jobs:
   test:
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
         wordpress: ["latest", "trunk", "6.0"]
         install-core-tests: [0, 1]
