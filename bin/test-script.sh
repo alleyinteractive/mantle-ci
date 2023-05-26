@@ -31,7 +31,7 @@ if ! grep -q "define( 'DB_USER', 'root' );" "$CONFIG_FILE"; then
   exit 1
 fi
 
-if ! grep -q "define( 'DB_PASSWORD', 'password' );" "$CONFIG_FILE"; then
+if ! grep -q "define( 'DB_PASSWORD', 'root' );" "$CONFIG_FILE"; then
   echo "DB_PASSWORD is not set correctly."
   exit 1
 fi
@@ -53,6 +53,12 @@ fi
 
 if [ ! -f "$WP_CORE_DIR/wp-content/object-cache.php" ]; then
   echo "$WP_CORE_DIR/wp-content/object-cache.php does not exist."
+  exit 1
+fi
+
+# Check if the database was created.
+if ! mysql -u root -proot -e "SHOW DATABASES;" | grep -q "wordpress_unit_tests"; then
+  echo "Database wordpress_unit_tests does not exist."
   exit 1
 fi
 

@@ -16,6 +16,14 @@ jobs:
         wordpress: ["latest", "trunk", "6.0"]
         install-core-tests: [0, 1]
     runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:5.7
+        env:
+          MYSQL_ROOT_PASSWORD: "root"
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
     name: "Test Script ${{ matrix.wordpress }} - Core Suites: ${{ matrix.install-core-tests }}"
     env:
       WP_CORE_DIR: '/tmp/wordpress'
@@ -31,5 +39,5 @@ jobs:
           export INSTALL_WP_TEST_DEBUG=1
           export WP_INSTALL_CORE_TEST_SUITE=${{ matrix.install-core-tests }}
 
-          bash install-wp-tests.sh wordpress_unit_tests root password 127.0.0.1 "$WP_VERSION" true true true
+          bash install-wp-tests.sh wordpress_unit_tests root "" 127.0.0.1 "$WP_VERSION" false true true
           bash bin/test-script.sh
