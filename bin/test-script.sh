@@ -1,5 +1,4 @@
 #!/bin/bash
-
 set -e
 
 # Test that the script ran correctly and properly installed WordPress.
@@ -55,6 +54,22 @@ fi
 if [ ! -f "$WP_CORE_DIR/wp-content/object-cache.php" ]; then
   echo "$WP_CORE_DIR/wp-content/object-cache.php does not exist."
   exit 1
+fi
+
+# If WP_INSTALL_CORE_TEST_SUITE is set to 1 then we should check if the core
+# test suite is installed.
+if [ "$WP_INSTALL_CORE_TEST_SUITE" == "1" ]; then
+  if [ ! -d "/tmp/wordpress-tests-lib/includes" ]; then
+    echo "/tmp/wordpress-tests-lib/includes does not exist."
+    exit 1
+  fi
+
+  if [ ! -f "/tmp/wordpress-tests-lib/includes/functions.php" ]; then
+    echo "/tmp/wordpress-tests-lib/includes/functions.php does not exist."
+    exit 1
+  fi
+else
+  echo "WP_INSTALL_CORE_TEST_SUITE is not set to 1."
 fi
 
 echo "WordPress installed successfully."
