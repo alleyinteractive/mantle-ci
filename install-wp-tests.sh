@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -e
 
-#
 # Install WordPress Tests for Development
 #
 # Primarily geared for development with Mantle framerwork/Mantle Testkit but also
@@ -289,7 +288,6 @@ install_test_suite() {
 		sed "$ioption" "s|localhost|${DB_HOST}|" "$WP_TESTS_DIR"/wp-tests-config.php
 	fi
 }
-
 
 install_db() {
 	if [ "${SKIP_DB_CREATE}" = "true" ]; then
