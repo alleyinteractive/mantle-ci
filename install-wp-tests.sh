@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+set -e
+
 #
 # Install WordPress Tests for Development
 #
@@ -29,7 +31,7 @@
 # 	4. Database Host: defaults to "localhost"
 # 	5. WordPress Version: defaults to "latest"
 # 	6. Skip Database Creation: defaults to false
-# 	7. Install Automattic's vip-mu-plugins-built: defaults to false
+# 	7. Install WordPress VIP's `Automattic/vip-go-mu-plugins-built` project to the `mu-plugins` directory: defaults to false
 # 	8. Install Memcached: defaults to false
 #
 # Environment Variables:
@@ -52,8 +54,6 @@
 # Example:
 #
 # 	install-wp-tests.sh wordpress_unit_tests root '' localhost latest false false false
-
-set -e
 
 # Convenient functions for printing colored text
 function green {
@@ -90,7 +90,7 @@ DB_PASS="${3:-}"
 DB_HOST="${4:-localhost}"
 WP_VERSION="${5:-latest}"
 SKIP_DB_CREATE=$(boolean "${6:-false}" "SKIP_DB_CREATE")
-INSTALL_MU_PLUGINS=$(boolean "${7:-false}" "INSTALL_MU_PLUGINS")
+INSTALL_VIP_MU_PLUGINS=$(boolean "${7:-false}" "INSTALL_VIP_MU_PLUGINS")
 INSTALL_OBJECT_CACHE=$(boolean "${8:-true}" "INSTALL_OBJECT_CACHE")
 
 # Environment variables with defaults.
@@ -316,8 +316,8 @@ install_db() {
 	mysqladmin create $DB_NAME --user="$DB_USER" --password="$DB_PASS"$EXTRA
 }
 
-install_mu_plugins() {
-	if [ "$INSTALL_MU_PLUGINS" != "true" ]; then
+install_vip_mu_plugins() {
+	if [ "$INSTALL_VIP_MU_PLUGINS" != "true" ]; then
 		yellow "Skipping installing mu-plugins"
 		return
 	fi
@@ -364,7 +364,7 @@ install_wp
 install_test_suite
 install_config
 install_db
-install_mu_plugins
+install_vip_mu_plugins
 install_object_cache
 
 green "Ready to test ${WP_CORE_DIR}/wp-content/ 🚀"
