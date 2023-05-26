@@ -14,9 +14,9 @@ jobs:
       fail-fast: true
       matrix:
         wordpress: ["latest", "trunk", "6.0"]
-        install-core-tests: [true, false]
+        install-core-tests: [1, 0]
     runs-on: ubuntu-latest
-    name: "Test Script ${{ matrix.wordpress }} ${{ matrix.install-core-tests }}"
+    name: "Test Script ${{ matrix.wordpress }} - Core Test Suites: ${{ matrix.install-core-tests }}"
     env:
       WP_CORE_DIR: '/tmp/wordpress'
       WP_VERSION: ${{ matrix.wordpress }}
