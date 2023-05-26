@@ -144,6 +144,7 @@ download() {
 	fi
 
 	# Exit if the last command failed.
+	# shellcheck disable=SC2181
 	if [ $? -ne 0 ]; then
 		echo "Downloading $1 failed"
 		exit 1
@@ -204,6 +205,7 @@ install_wp() {
 				LATEST_VERSION=${WP_VERSION%??}
 			else
 				# otherwise, scan the releases and get the most up to date minor version of the major release
+				# shellcheck disable=SC2001
 				VERSION_ESCAPED=$(echo "$WP_VERSION" | sed 's/\./\\\\./g')
 				LATEST_VERSION=$(grep -o '"version":"'"$VERSION_ESCAPED"'[^"]*' "$CACHEDIR/wp-latest.json" | sed 's/"version":"//' | head -1)
 			fi
@@ -219,7 +221,7 @@ install_wp() {
 		tar --strip-components=1 -zxmf "$CACHEDIR/wordpress.tar.gz" -C "$WP_CORE_DIR"
 	fi
 
-	download https://raw.githubusercontent.com/markoheijnen/wp-mysqli/master/db.php $WP_CORE_DIR/wp-content/db.php
+	download https://raw.githubusercontent.com/markoheijnen/wp-mysqli/master/db.php "$WP_CORE_DIR/wp-content/db.php"
 }
 
 install_config() {
@@ -233,9 +235,12 @@ install_config() {
 	green "Installing wp-tests-config.php"
 
 	if [ ! -f wp-tests-config.php ]; then
-		download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/wp-tests-config-sample.php "$WP_CORE_DIR"/wp-tests-config.php
+		download https://raw.githubusercontent.com/alleyinteractive/mantle-ci/HEAD/wp-tests-config-sample.php "$WP_CORE_DIR/wp-tests-config.php"
+
 		# remove all forward slashes in the end
+		# shellcheck disable=SC2001
 		WP_CORE_DIR=$(echo "$WP_CORE_DIR" | sed "s:/\+$::")
+
 		sed $ioption "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" "$WP_CORE_DIR"/wp-tests-config.php
 		sed $ioption "s/youremptytestdbnamehere/$DB_NAME/" "$WP_CORE_DIR"/wp-tests-config.php
 		sed $ioption "s/yourusernamehere/$DB_USER/" "$WP_CORE_DIR"/wp-tests-config.php
@@ -269,7 +274,11 @@ install_test_suite() {
 
 	if [ ! -f wp-tests-config.php ]; then
 		download "https://develop.svn.wordpress.org/$WP_TESTS_TAG/wp-tests-config-sample.php" "$WP_TESTS_DIR"/wp-tests-config.php
-		WP_CORE_DIR=$(echo $WP_CORE_DIR | sed "s:/\+$::")
+
+		# Remove the trailing forward slash
+		# shellcheck disable=SC2001
+		WP_CORE_DIR=$(echo "$WP_CORE_DIR" | sed "s:/\+$::")
+
 		sed "$ioption" "s:dirname( __FILE__ ) . '/src/':'$WP_CORE_DIR/':" "$WP_TESTS_DIR"/wp-tests-config.php
 		sed "$ioption" "s/youremptytestdbnamehere/$DB_NAME/" "$WP_TESTS_DIR"/wp-tests-config.php
 		sed "$ioption" "s/yourusernamehere/$DB_USER/" "$WP_TESTS_DIR"/wp-tests-config.php
