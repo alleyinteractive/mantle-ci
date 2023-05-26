@@ -181,7 +181,7 @@ set -e
 
 install_wp() {
 	if [ -d "$WP_CORE_DIR" ]; then
-		if [ -f "$WP_CORE_DIR"/wp-load.php ]; then
+		if [ -f "$WP_CORE_DIR/wp-load.php" ]; then
 			echo "WordPress already installed at [$WP_CORE_DIR]"
 			return
 		fi
@@ -192,10 +192,10 @@ install_wp() {
 	mkdir -p "$WP_CORE_DIR"
 
 	if [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
-		mkdir -p "$CACHEDIR"/wordpress-nightly
+		mkdir -p "$CACHEDIR/wordpress-nightly"
 		download "https://wordpress.org/nightly-builds/wordpress-latest.zip"  "$CACHEDIR/wordpress-nightly/wordpress-nightly.zip"
 		unzip -q "$CACHEDIR/wordpress-nightly/wordpress-nightly.zip" -d "$CACHEDIR/wordpress-nightly/"
-		mv "$CACHEDIR"/wordpress-nightly/wordpress/* $WP_CORE_DIR
+		mv "$CACHEDIR/wordpress-nightly/wordpress/"* "$WP_CORE_DIR"
 	else
 		if [ $WP_VERSION == 'latest' ]; then
 			local ARCHIVE_NAME='latest'
