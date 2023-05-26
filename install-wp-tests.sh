@@ -312,13 +312,11 @@ install_db() {
 		fi
 	fi
 
-	# Drop the database before creating it, allowing errors to be ignored.
-	set +e
+	# Drop the database if it exists.
 	# shellcheck disable=SC2086
-	mysqladmin drop "$DB_NAME" -f --user="$DB_USER" --password="$DB_PASS"$EXTRA
-	set -e
+	mysqladmin drop "$DB_NAME" -f --user="$DB_USER" --password="$DB_PASS"$EXTRA || true
 
-	# create database
+	# Create the new databaase.
 	# shellcheck disable=SC2086
 	mysqladmin create "$DB_NAME" --user="$DB_USER" --password="$DB_PASS"$EXTRA
 }

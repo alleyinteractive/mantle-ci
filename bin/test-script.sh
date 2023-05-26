@@ -2,6 +2,8 @@
 set -e
 
 # Test that the script ran correctly and properly installed WordPress.
+echo ""
+echo "Starting tests..."
 
 if [ ! -d "$WP_CORE_DIR" ]; then
   echo "$WP_CORE_DIR does not exist."
@@ -57,7 +59,7 @@ if [ ! -f "$WP_CORE_DIR/wp-content/object-cache.php" ]; then
 fi
 
 # Check if the database was created.
-if ! mysql -u root -proot -h localhost -e "use wordpress_unit_tests"; then
+if ! mysql -u root -proot -h 127.0.0.1 -e "use wordpress_unit_tests"; then
   echo "Database wordpress_unit_tests does not exist."
   exit 1
 fi
