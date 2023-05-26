@@ -39,5 +39,5 @@ jobs:
           export INSTALL_WP_TEST_DEBUG=1
           export WP_INSTALL_CORE_TEST_SUITE=${{ matrix.install-core-tests }}
 
-          bash install-wp-tests.sh wordpress_unit_tests root "" 127.0.0.1 "$WP_VERSION" false true true
+          bash install-wp-tests.sh wordpress_unit_tests root root 127.0.0.1 "$WP_VERSION" false true true
           bash bin/test-script.sh
