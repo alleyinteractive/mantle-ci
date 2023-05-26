@@ -36,7 +36,7 @@ if ! grep -q "define( 'DB_PASSWORD', 'root' );" "$CONFIG_FILE"; then
   exit 1
 fi
 
-if ! grep -q "define( 'DB_HOST', '127.0.0.1' );" "$CONFIG_FILE"; then
+if ! grep -q "define( 'DB_HOST', 'localhost' );" "$CONFIG_FILE"; then
   echo "DB_HOST is not set correctly."
   exit 1
 fi
