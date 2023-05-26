@@ -14,9 +14,9 @@ jobs:
       fail-fast: true
       matrix:
         wordpress: ["latest", "trunk", "6.0"]
-        install-core-tests: [1, 0]
+        install-core-tests: [0, 1]
     runs-on: ubuntu-latest
-    name: "Test Script ${{ matrix.wordpress }} - Core Test Suites: ${{ matrix.install-core-tests }}"
+    name: "Test Script ${{ matrix.wordpress }} - Core Suites: ${{ matrix.install-core-tests }}"
     env:
       WP_CORE_DIR: '/tmp/wordpress'
       WP_VERSION: ${{ matrix.wordpress }}
@@ -25,13 +25,11 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - name: "Run install-wp-tests.sh"
+      - name: "Run install-wp-tests.sh and check installation"
         shell: bash
         run: |
           export INSTALL_WP_TEST_DEBUG=1
           export WP_INSTALL_CORE_TEST_SUITE=${{ matrix.install-core-tests }}
 
           bash install-wp-tests.sh wordpress_unit_tests root password 127.0.0.1 "$WP_VERSION" true true true
-      - name: "Check Installation"
-        shell: bash
-        run: bash bin/test-script.sh
+          bash bin/test-script.sh
