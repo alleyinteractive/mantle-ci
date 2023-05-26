@@ -141,6 +141,9 @@ download() {
 		curl -f -s "$1" > "$2"
 	elif command -v wget >/dev/null 2>&1; then
 		wget -nv -O "$2" "$1"
+	else
+		red "Could not find curl or wget"
+		exit 1
 	fi
 
 	# Exit if the last command failed.

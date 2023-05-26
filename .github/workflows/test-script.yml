@@ -39,5 +39,6 @@ jobs:
           export INSTALL_WP_TEST_DEBUG=1
           export WP_INSTALL_CORE_TEST_SUITE=${{ matrix.install-core-tests }}
 
+          # install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-mu-plugins> <install-memcached>
           bash install-wp-tests.sh wordpress_unit_tests root root localhost "$WP_VERSION" false true true
           bash bin/test-script.sh
