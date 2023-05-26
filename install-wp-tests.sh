@@ -102,8 +102,6 @@ WP_MULTISITE=${WP_MULTISITE:-0}
 WP_INSTALL_CORE_TEST_SUITE=$(boolean "${WP_INSTALL_CORE_TEST_SUITE:-false}" "WP_INSTALL_CORE_TEST_SUITE")
 INSTALL_WP_TEST_DEBUG=$(boolean "${INSTALL_WP_TEST_DEBUG:-false}" "INSTALL_WP_TEST_DEBUG")
 
-set +e
-
 # Allow the script to dump all variables for debugging.
 if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
 	echo "WP_VERSION: ${WP_VERSION}"
@@ -152,7 +150,8 @@ download() {
 	fi
 }
 
-
+# Determine the WordPress core test tag to install and the latest version of
+# WordPress that can be installed.
 if [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
 	WP_TESTS_TAG="branches/$WP_VERSION"
 elif [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
@@ -167,8 +166,9 @@ elif [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
 else
 	# http serves a single offer, whereas https serves multiple. we only want one
 	download http://api.wordpress.org/core/version-check/1.7/ /tmp/wp-latest.json
-	grep '[0-9]+\.[0-9]+(\.[0-9]+)?' /tmp/wp-latest.json
+
 	LATEST_VERSION=$(grep -o '"version":"[^"]*' /tmp/wp-latest.json | sed 's/"version":"//')
+
 	if [[ -z "$LATEST_VERSION" ]]; then
 		echo "Latest WordPress version could not be found"
 		exit 1
@@ -288,17 +288,17 @@ install_db() {
 	green "Creating database $DB_NAME"
 
 	# parse DB_HOST for port or socket references
-	local PARTS=(${DB_HOST//\:/ })
-	local DB_HOSTNAME=${PARTS[0]};
-	local DB_SOCK_OR_PORT=${PARTS[1]};
+	local PARTS=("${DB_HOST//:/ }")
+	local DB_HOSTNAME=${PARTS[0]}
+	local DB_SOCK_OR_PORT=${PARTS[1]}
 	local EXTRA=""
 
-	if ! [ -z $DB_HOSTNAME ] ; then
-		if [ "$(echo "$DB_SOCK_OR_PORT" | grep -q -e '^[0-9]\{1,\}$')" ]; then
+	if [ -n "$DB_HOSTNAME" ]; then
+		if echo "$DB_SOCK_OR_PORT" | grep -q -e '^[0-9]\{1,\}$'; then
 			EXTRA=" --host=$DB_HOSTNAME --port=$DB_SOCK_OR_PORT --protocol=tcp"
-		elif ! [ -z $DB_SOCK_OR_PORT ] ; then
+		elif [ -n "$DB_SOCK_OR_PORT" ]; then
 			EXTRA=" --socket=$DB_SOCK_OR_PORT"
-		elif ! [ -z $DB_HOSTNAME ] ; then
+		elif [ -n "$DB_HOSTNAME" ]; then
 			EXTRA=" --host=$DB_HOSTNAME --protocol=tcp"
 		fi
 	fi
