@@ -152,7 +152,6 @@ download() {
 	fi
 }
 
-set +e
 
 if [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
 	WP_TESTS_TAG="branches/$WP_VERSION"
@@ -176,8 +175,6 @@ else
 	fi
 	WP_TESTS_TAG="tags/$LATEST_VERSION"
 fi
-
-set -e
 
 install_wp() {
 	if [ -d "$WP_CORE_DIR" ]; then
