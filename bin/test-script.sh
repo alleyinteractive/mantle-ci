@@ -57,7 +57,7 @@ if [ ! -f "$WP_CORE_DIR/wp-content/object-cache.php" ]; then
 fi
 
 # Check if the database was created.
-if ! mysql -u root -proot -e "SHOW DATABASES;" | grep -q "wordpress_unit_tests"; then
+if ! mysql -u root -proot -h localhost -e "use wordpress_unit_tests"; then
   echo "Database wordpress_unit_tests does not exist."
   exit 1
 fi
