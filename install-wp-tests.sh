@@ -336,6 +336,7 @@ install_vip_mu_plugins() {
 	# Checkout VIP Go mu-plugins to mu-plugins
 	if [ ! -d "mu-plugins" ]; then
 		git clone \
+			--quiet \
 			--recursive \
 			--depth=1 \
 			https://github.com/Automattic/vip-go-mu-plugins-built.git mu-plugins
