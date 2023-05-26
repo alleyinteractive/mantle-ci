@@ -5,7 +5,7 @@ set -e
 # Install WordPress Tests for Development
 #
 # Primarily geared for development with Mantle framerwork/Mantle Testkit but also
-# supported installing the core WordPress test suite as well. Mirrors the
+# supports installing the core WordPress test suite as well. Mirrors the
 # WordPress/wp-cli install-wp-tests.sh script with a few modifications:
 #
 # 1. By default it will not install the core test suite. This means that we will
@@ -137,9 +137,9 @@ download() {
 		fi
 	fi
 
-	if [ "$(which curl)" ]; then
+	if command -v curl >/dev/null 2>&1; then
 		curl -f -s "$1" > "$2"
-	elif [ "$(which wget)" ]; then
+	elif command -v wget >/dev/null 2>&1; then
 		wget -nv -O "$2" "$1"
 	fi
 
