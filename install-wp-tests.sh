@@ -172,9 +172,9 @@ elif [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
 	WP_TESTS_TAG="trunk"
 else
 	# http serves a single offer, whereas https serves multiple. we only want one
-	download http://api.wordpress.org/core/version-check/1.7/ /tmp/wp-latest.json
+	download http://api.wordpress.org/core/version-check/1.7/ "$CACHEDIR/wp-latest.json"
 
-	LATEST_VERSION=$(grep -o '"version":"[^"]*' /tmp/wp-latest.json | sed 's/"version":"//')
+	LATEST_VERSION=$(grep -o '"version":"[^"]*' "$CACHEDIR/wp-latest.json" | sed 's/"version":"//')
 
 	if [[ -z "$LATEST_VERSION" ]]; then
 		echo "Latest WordPress version could not be found"
