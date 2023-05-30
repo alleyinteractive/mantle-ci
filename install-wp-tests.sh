@@ -123,9 +123,7 @@ if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
 fi
 
 # Create the cache directory if it doesn't exist.
-if [[ ! -d $CACHEDIR ]]; then
-	mkdir -p "$CACHEDIR" || (red "Could not create cache directory at $CACHEDIR" && exit 1)
-fi
+mkdir -p "$CACHEDIR"
 
 download() {
 	# Check if the file has been downloaded in the last couple of hours.
