@@ -107,7 +107,9 @@ INSTALL_WP_TEST_DEBUG=$(boolean "${INSTALL_WP_TEST_DEBUG:-false}" "INSTALL_WP_TE
 # Allow the script to dump all variables for debugging.
 if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
 	# Display all commands being run for easy debugging.
-	set -x
+	if [ "$WP_DISPLAY_INSTALL_COMMANDS" = "true" ]; then
+		set -x
+	fi
 
 	green "Dumping all variables for debugging:"
 	echo "WP_VERSION: ${WP_VERSION}"
