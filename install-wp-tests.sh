@@ -47,6 +47,8 @@ set -e
 # 		Defaults to false.
 # 	WP_TESTS_TAG: The tag of the WordPress core test suite to install.
 # 		Defaults to "trunk".
+# 	WP_USE_SQLITE: Whether or not to use SQLite for the database.
+# 		Defaults to false.
 # 	INSTALL_WP_TEST_DEBUG: Whether or not to dump all variables for debugging.
 # 		Defaults to false.
 #
@@ -99,12 +101,15 @@ WP_CORE_DIR=${WP_CORE_DIR:-"${CACHEDIR}/wordpress"}
 WP_TESTS_DIR=${WP_TESTS_DIR:-/tmp/wordpress-tests-lib} # Only used with core test suite.
 WP_MULTISITE=${WP_MULTISITE:-0}
 WP_INSTALL_CORE_TEST_SUITE=$(boolean "${WP_INSTALL_CORE_TEST_SUITE:-false}" "WP_INSTALL_CORE_TEST_SUITE")
+WP_USE_SQLITE=$(boolean "${WP_USE_SQLITE:-false}" "WP_USE_SQLITE")
 INSTALL_WP_TEST_DEBUG=$(boolean "${INSTALL_WP_TEST_DEBUG:-false}" "INSTALL_WP_TEST_DEBUG")
 
 # Allow the script to dump all variables for debugging.
 if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
 	# Display all commands being run for easy debugging.
-	set -x
+	if [ "$WP_DISPLAY_INSTALL_COMMANDS" = "true" ]; then
+		set -x
+	fi
 
 	green "Dumping all variables for debugging:"
 	echo "WP_VERSION: ${WP_VERSION}"
@@ -120,6 +125,7 @@ if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
 	echo "INSTALL_VIP: ${INSTALL_VIP}"
 	echo "INSTALL_OBJECT_CACHE: ${INSTALL_OBJECT_CACHE}"
 	echo "WP_INSTALL_CORE_TEST_SUITE: ${WP_INSTALL_CORE_TEST_SUITE}"
+	echo "WP_USE_SQLITE: ${WP_USE_SQLITE}"
 fi
 
 # Create the cache directory if it doesn't exist.
@@ -225,7 +231,19 @@ install_wp() {
 		tar --strip-components=1 -zxmf "$CACHEDIR/wordpress.tar.gz" -C "$WP_CORE_DIR"
 	fi
 
-	download https://raw.githubusercontent.com/markoheijnen/wp-mysqli/master/db.php "$WP_CORE_DIR/wp-content/db.php"
+	if [ "$WP_USE_SQLITE" == "true" ]; then
+		if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
+			green "Installing SQLite db.php drop-in"
+		fi
+
+		download https://raw.githubusercontent.com/aaemnnosttv/wp-sqlite-db/1c52157e2e75693efc94fcd7a9ac36bf5d2f6012/src/db.php "$WP_CORE_DIR/wp-content/db.php"
+	else
+		if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
+			green "Installing mysqli db.php drop-in"
+		fi
+
+		download https://raw.githubusercontent.com/markoheijnen/wp-mysqli/master/db.php "$WP_CORE_DIR/wp-content/db.php"
+	fi
 }
 
 install_config() {
