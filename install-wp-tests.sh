@@ -103,6 +103,10 @@ INSTALL_WP_TEST_DEBUG=$(boolean "${INSTALL_WP_TEST_DEBUG:-false}" "INSTALL_WP_TE
 
 # Allow the script to dump all variables for debugging.
 if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
+	# Display all commands being run for easy debugging.
+	set -x
+
+	green "Dumping all variables for debugging:"
 	echo "WP_VERSION: ${WP_VERSION}"
 	echo "WP_CORE_DIR: ${WP_CORE_DIR}"
 	echo "CACHEDIR: ${CACHEDIR}"
