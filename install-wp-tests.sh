@@ -124,7 +124,7 @@ fi
 
 # Create the cache directory if it doesn't exist.
 if [[ ! -d $CACHEDIR ]]; then
-	mkdir -p "$CACHEDIR" || red "Could not create directory $CACHEDIR" && exit 1
+	mkdir -p "$CACHEDIR" || (red "Could not create cache directory at $CACHEDIR" && exit 1)
 fi
 
 download() {
