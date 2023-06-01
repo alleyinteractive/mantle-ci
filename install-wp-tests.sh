@@ -92,7 +92,7 @@ DB_HOST="${4:-localhost}"
 WP_VERSION="${5:-latest}"
 SKIP_DB_CREATE=$(boolean "${6:-false}" "SKIP_DB_CREATE")
 INSTALL_VIP_MU_PLUGINS=$(boolean "${7:-false}" "INSTALL_VIP_MU_PLUGINS")
-INSTALL_OBJECT_CACHE=$(boolean "${8:-true}" "INSTALL_OBJECT_CACHE")
+INSTALL_OBJECT_CACHE=$(boolean "${8:-false}" "INSTALL_OBJECT_CACHE")
 
 # Environment variables with defaults.
 CACHEDIR=${CACHEDIR:-/tmp}
