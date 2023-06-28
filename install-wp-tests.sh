@@ -14,9 +14,9 @@ set -e
 #    configured by the `CACHEDIR` environment variable for the location of the cache
 #    directory. It can also be disabled by setting `CACHEDIR` to false.
 # 3. The script can optionally install Automattic's vip-mu-plugins-built as well as the
-#    object-cache.php file for Memcached support. This can be configured by the
-#    `INSTALL_VIP_MU_PLUGINS` environment variable (disabled by default) and the
-#    `INSTALL_MEMCACHED` environment variable (enabled by default).
+#    object-cache.php file for Memcached support. This can be configured by passing
+#    the `<install-vip-mu-plugins>` and `<install-memcached>` arguments to the command
+#    with both disabled by default.
 #
 # Usage:
 #
