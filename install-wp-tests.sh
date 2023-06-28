@@ -20,7 +20,7 @@ set -e
 #
 # Usage:
 #
-# 	install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-mu-plugins> <install-memcached>
+# 	install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-memcached>
 #
 # Arguments (all are optional but must be in order and cannot be skipped):
 #
