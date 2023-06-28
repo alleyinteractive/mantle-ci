@@ -15,12 +15,12 @@ set -e
 #    directory. It can also be disabled by setting `CACHEDIR` to false.
 # 3. The script can optionally install Automattic's vip-mu-plugins-built as well as the
 #    object-cache.php file for Memcached support. This can be configured by the
-#    `INSTALL_VIP` environment variable (disabled by default) and the
+#    `INSTALL_VIP_MU_PLUGINS` environment variable (disabled by default) and the
 #    `INSTALL_MEMCACHED` environment variable (enabled by default).
 #
 # Usage:
 #
-# 	install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-mu-plugins> <install-memcached>
+# 	install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-memcached>
 #
 # Arguments (all are optional but must be in order and cannot be skipped):
 #
@@ -122,7 +122,7 @@ if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
 	echo "DB_PASS: ${DB_PASS}"
 	echo "DB_HOST: ${DB_HOST}"
 	echo "SKIP_DB_CREATE: ${SKIP_DB_CREATE}"
-	echo "INSTALL_VIP: ${INSTALL_VIP}"
+	echo "INSTALL_VIP_MU_PLUGINS: ${INSTALL_VIP_MU_PLUGINS}"
 	echo "INSTALL_OBJECT_CACHE: ${INSTALL_OBJECT_CACHE}"
 	echo "WP_INSTALL_CORE_TEST_SUITE: ${WP_INSTALL_CORE_TEST_SUITE}"
 	echo "WP_USE_SQLITE: ${WP_USE_SQLITE}"
