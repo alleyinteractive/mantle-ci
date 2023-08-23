@@ -6,5 +6,7 @@ Mantle packages. Documentation can be found inside the
 
 ## Scripts
 
+- [`install-plugin`](install-plugin.sh) - Script used internally by Mantle for
+  installing a plugin in a CI environment.
 - [`install-wp-tests.sh`](install-wp-tests.sh) - Script used internally by
   Mantle for installing WordPress in a CI environment.
