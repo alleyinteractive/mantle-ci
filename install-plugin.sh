@@ -32,17 +32,17 @@ set -e
 # Convenient functions for printing colored text
 function green {
   # green text to stdout
-	echo "$@" | sed $'s,.*,\e[32m&\e[m,' | xargs -0 printf
+  echo "$@" | sed $'s,.*,\e[32m&\e[m,' | xargs -0 printf
 }
 
 function yellow {
-	# yellow text to stderr
-	echo "$@" | sed $'s,.*,\e[33m&\e[m,' | >&2 xargs -0 printf
+  # yellow text to stderr
+  echo "$@" | sed $'s,.*,\e[33m&\e[m,' | >&2 xargs -0 printf
 }
 
 function red {
-	# red text to stderr
-	echo "$@" | sed $'s,.*,\e[31m&\e[m,' | >&2 xargs -0 printf
+  # red text to stderr
+  echo "$@" | sed $'s,.*,\e[31m&\e[m,' | >&2 xargs -0 printf
 }
 
 # Arguments passed to the script.
@@ -81,35 +81,35 @@ mkdir -p "$WP_CORE_DIR/wp-content/plugins"
 
 # Method to download a file.
 download() {
-	# Check if the file has been downloaded in the last couple of hours.
-	# If it has been, use it instead of downloading it again.
-	if [[ -f $2 ]]; then
-		if test "$(find "$2" -mmin -240)"; then
-			if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
-				yellow "Using cached $2"
-			fi
+  # Check if the file has been downloaded in the last couple of hours.
+  # If it has been, use it instead of downloading it again.
+  if [[ -f $2 ]]; then
+    if test "$(find "$2" -mmin -240)"; then
+      if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
+        yellow "Using cached $2"
+      fi
 
-			return
-		fi
-	fi
+      return
+    fi
+  fi
 
   set +e
 
-	if command -v curl >/dev/null 2>&1; then
+  if command -v curl >/dev/null 2>&1; then
     curl -L -f -s "$1" > "$2"
-	elif command -v wget >/dev/null 2>&1; then
-		wget -nv -O "$2" "$1"
-	else
-		red "Could not find curl or wget"
-		exit 1
-	fi
+  elif command -v wget >/dev/null 2>&1; then
+    wget -nv -O "$2" "$1"
+  else
+    red "Could not find curl or wget"
+    exit 1
+  fi
 
-	# Exit if the last command failed.
-	# shellcheck disable=SC2181
-	if [ $? -ne 0 ]; then
-		echo "Downloading $1 failed"
-		exit 1
-	fi
+  # Exit if the last command failed.
+  # shellcheck disable=SC2181
+  if [ $? -ne 0 ]; then
+    echo "Downloading $1 failed"
+    exit 1
+  fi
 
   set -e
 }
