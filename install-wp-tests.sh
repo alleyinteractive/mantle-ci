@@ -132,10 +132,10 @@ fi
 mkdir -p "$CACHEDIR"
 
 download() {
-  # Check if the file has been downloaded in the last couple of hours.
+  # Check if the file has been downloaded in the last 72 hours.
   # If it has been, use it instead of downloading it again.
   if [[ -f $2 ]]; then
-    if test "$(find "$2" -mmin -240)"; then
+    if test "$(find "$2" -mtime -3)"; then
       if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
         yellow "Using cached $2"
       fi
