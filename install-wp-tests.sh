@@ -108,12 +108,10 @@ echo "Debug Mode: $INSTALL_WP_TEST_DEBUG"
 
 # Allow the script to dump all variables for debugging.
 if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
-  # Display all commands being run for easy debugging.
-  if [ "$WP_DISPLAY_INSTALL_COMMANDS" = "true" ]; then
-    set -x
-  fi
+  set -x
 
   green "Dumping all variables for debugging:"
+
   echo "WP_VERSION: ${WP_VERSION}"
   echo "WP_CORE_DIR: ${WP_CORE_DIR}"
   echo "CACHEDIR: ${CACHEDIR}"
@@ -133,8 +131,10 @@ fi
 # Create the cache directory if it doesn't exist.
 mkdir -p "$CACHEDIR"
 
-echo "Cache Directory: $CACHEDIR"
-ls -al "$CACHEDIR"
+# List the contents of the cache directory if debugging.
+if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
+  ls -al "$CACHEDIR"
+fi
 
 download() {
   # Check if the file has been downloaded in the last 72 hours.
