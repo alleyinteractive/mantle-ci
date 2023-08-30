@@ -85,9 +85,7 @@ download() {
   # If it has been, use it instead of downloading it again.
   if [[ -f $2 ]]; then
     if test "$(find "$2" -mtime -3)"; then
-      if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
-        yellow "Using cached $2"
-      fi
+      yellow "Using cached $2"
 
       return
     fi
