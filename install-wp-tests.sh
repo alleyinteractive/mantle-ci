@@ -104,6 +104,8 @@ WP_INSTALL_CORE_TEST_SUITE=$(boolean "${WP_INSTALL_CORE_TEST_SUITE:-false}" "WP_
 WP_USE_SQLITE=$(boolean "${WP_USE_SQLITE:-false}" "WP_USE_SQLITE")
 INSTALL_WP_TEST_DEBUG=$(boolean "${INSTALL_WP_TEST_DEBUG:-false}" "INSTALL_WP_TEST_DEBUG")
 
+echo "Debug Mode: $INSTALL_WP_TEST_DEBUG"
+
 # Allow the script to dump all variables for debugging.
 if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
   # Display all commands being run for easy debugging.
