@@ -130,10 +130,11 @@ if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
   echo "WP_USE_SQLITE: ${WP_USE_SQLITE}"
 fi
 
-echo "Cache Directory: $CACHEDIR"
-
 # Create the cache directory if it doesn't exist.
 mkdir -p "$CACHEDIR"
+
+echo "Cache Directory: $CACHEDIR"
+ls -al "$CACHEDIR"
 
 download() {
   # Check if the file has been downloaded in the last 72 hours.
