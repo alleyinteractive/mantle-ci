@@ -230,8 +230,8 @@ install_wp() {
     else
       ARCHIVE_NAME="wordpress-$WP_VERSION"
     fi
-    download "https://wordpress.org/${ARCHIVE_NAME}.tar.gz" "$CACHEDIR/wordpress.tar.gz"
-    tar --strip-components=1 -zxmf "$CACHEDIR/wordpress.tar.gz" -C "$WP_CORE_DIR"
+    download "https://wordpress.org/${ARCHIVE_NAME}.tar.gz" "${CACHEDIR}/${ARCHIVE_NAME}.tar.gz"
+    tar --strip-components=1 -zxmf "${CACHEDIR}/${ARCHIVE_NAME}.tar.gz" -C "$WP_CORE_DIR"
   fi
 
   if [ "$WP_USE_SQLITE" == "true" ]; then
