@@ -58,6 +58,16 @@ if [ ! -f "$WP_CORE_DIR/wp-content/object-cache.php" ]; then
   exit 1
 fi
 
+if ! grep -q "require_once ABSPATH . 'wp-content/mu-plugins/000-pre-vip-config/requires.php';" "$CONFIG_FILE"; then
+  echo "mu-plugins/000-pre-vip-config/requires.php is not loaded in wp-tests-config.php."
+  exit 1
+fi
+
+if ! grep -q "require_once ABSPATH . 'wp-content/vip-config/vip-config.php';" "$CONFIG_FILE"; then
+  echo "vip-config/vip-config.php is not loaded in wp-tests-config.php."
+  exit 1
+fi
+
 # Check if the database was created.
 if ! mysql -u root -proot -h 127.0.0.1 -e "use wordpress_unit_tests"; then
   echo "Database wordpress_unit_tests does not exist."
