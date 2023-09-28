@@ -103,7 +103,7 @@ WP_MULTISITE=${WP_MULTISITE:-0}
 WP_INSTALL_CORE_TEST_SUITE=$(boolean "${WP_INSTALL_CORE_TEST_SUITE:-false}" "WP_INSTALL_CORE_TEST_SUITE")
 WP_USE_SQLITE=$(boolean "${WP_USE_SQLITE:-false}" "WP_USE_SQLITE")
 INSTALL_WP_TEST_DEBUG=$(boolean "${INSTALL_WP_TEST_DEBUG:-false}" "INSTALL_WP_TEST_DEBUG")
-
+INSTALL_VIP_CONFIG=$(boolean "${INSTALL_VIP_CONFIG:-${INSTALL_VIP_MU_PLUGINS}}" "INSTALL_VIP_CONFIG") # Inherit the default value from INSTALL_VIP_MU_PLUGINS.
 echo "Debug Mode: $INSTALL_WP_TEST_DEBUG"
 
 # Allow the script to dump all variables for debugging.
@@ -123,6 +123,7 @@ if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
   echo "DB_HOST: ${DB_HOST}"
   echo "SKIP_DB_CREATE: ${SKIP_DB_CREATE}"
   echo "INSTALL_VIP_MU_PLUGINS: ${INSTALL_VIP_MU_PLUGINS}"
+  echo "INSTALL_VIP_CONFIG: ${INSTALL_VIP_CONFIG}"
   echo "INSTALL_OBJECT_CACHE: ${INSTALL_OBJECT_CACHE}"
   echo "WP_INSTALL_CORE_TEST_SUITE: ${WP_INSTALL_CORE_TEST_SUITE}"
   echo "WP_USE_SQLITE: ${WP_USE_SQLITE}"
@@ -374,6 +375,43 @@ install_vip_mu_plugins() {
     git pull
     cd ..
   fi
+
+  # Install the `000-pre-vip-config/requires.php` to the test configuration if
+  # the file isn't already modified.
+  #
+  # see: https://docs.wpvip.com/how-tos/third-party-local-development/#h-step-4-update-wp-config-php
+  if [ -f "$WP_CORE_DIR/wp-tests-config.php" ] && ! grep -q "000-pre-vip-config/requires.php" "$WP_CORE_DIR/wp-tests-config.php"; then
+    printf "\\n// Load early dependencies\\nif ( file_exists( ABSPATH . 'wp-content/mu-plugins/000-pre-vip-config/requires.php' ) ) require_once ABSPATH . 'wp-content/mu-plugins/000-pre-vip-config/requires.php';\\n" >> "$WP_CORE_DIR/wp-tests-config.php"
+
+    green "Added 000-pre-vip-config/requires.php to wp-tests-config.php"
+  fi
+}
+
+# Install the vip-config/vip-config.php file to the test configuration
+#
+# see: https://docs.wpvip.com/how-tos/third-party-local-development/#h-step-4-update-wp-config-php
+install_vip_config() {
+  # Prevent installation of the vip-config.php into wp-config.php if disabled OR
+  # if VIP's mu-plugins are not installed.
+  if [ "$INSTALL_VIP_CONFIG" != "true" ] || [ ! -f "${WP_CORE_DIR}/wp-content/mu-plugins/000-pre-vip-config/requires.php" ]; then
+    yellow "Skipping vip-config/vip-config.php installation to wp-tests-config.php"
+    return
+  fi
+
+  if [ ! -f "$WP_CORE_DIR/wp-tests-config.php" ]; then
+    red "wp-tests-config.php does not exist, aborting"
+    return
+  fi
+
+  # Check if the modification to wp-tests-config.php has already been made.
+  if grep -q "vip-config.php" "$WP_CORE_DIR/wp-tests-config.php"; then
+    yellow "vip-config.php already included in wp-tests-config.php, skipping"
+    return
+  fi
+
+  printf "\\n// Load the vip-config/vip-config.php file if it exists.\\nif ( file_exists( ABSPATH . 'wp-content/vip-config/vip-config.php' ) ) require_once ABSPATH . 'wp-content/vip-config/vip-config.php';\\n" >> "$WP_CORE_DIR/wp-tests-config.php"
+
+  green "Added vip-config/vip-config.php to wp-tests-config.php"
 }
 
 install_object_cache() {
@@ -401,6 +439,7 @@ install_test_suite
 install_config
 install_db
 install_vip_mu_plugins
+install_vip_config
 install_object_cache
 
 green "Ready to test ${WP_CORE_DIR}/wp-content/ 🚀"
