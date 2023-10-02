@@ -388,12 +388,15 @@ install_object_cache() {
     return
   fi
 
-  green "Installing object-cache.php"
-
-  # Download the object cache drop-in.
-  # TODO: use the mu-plugins object-cache.php instead if this is a VIP project
-  # (requires setting the VIP_GO_APP_ENVIRONMENT constant).
-  download "https://raw.githubusercontent.com/Automattic/wp-memcached/HEAD/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+  # If we're installing mu-plugins, symlink the object-cache.php file from the
+  # mu-plugins installation. Otherwise, download it from wp-memcached.
+  if [ "$INSTALL_VIP_MU_PLUGINS" == "true" ] || [ -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" ]; then
+    green "Symlinking object-cache.php from VIP Go mu-plugins"
+    ln -s "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+  else
+    green "Downloading object-cache.php from wp-memcached"
+    download "https://raw.githubusercontent.com/Automattic/wp-memcached/HEAD/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+  fi
 }
 
 install_wp
