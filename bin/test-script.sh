@@ -69,7 +69,7 @@ if ! grep -q "require_once ABSPATH . 'wp-content/vip-config/vip-config.php';" "$
 fi
 
 # Check if the database was created if not using SQLite.
-if [ -z "$WP_USE_SQLITE" ]; then
+if [ "$WP_USE_SQLITE" == "false" ]; then
   if ! mysql -u root -proot -h 127.0.0.1 -e "use wordpress_unit_tests"; then
     echo "Database wordpress_unit_tests does not exist."
     exit 1
