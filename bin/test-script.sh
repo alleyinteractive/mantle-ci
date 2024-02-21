@@ -75,7 +75,6 @@ if [ "$WP_USE_SQLITE" == "false" ]; then
     exit 1
   fi
 else
-  exit 1 # Test break
   # Check if the SQLite plugin is installed.
   if [ ! -f "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration/wp-includes/sqlite/db.php" ]; then
     echo "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration/wp-includes/sqlite/db.php does not exist."
