@@ -18,7 +18,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: "root"
         ports:
@@ -38,6 +38,16 @@ jobs:
         run: |
           export INSTALL_WP_TEST_DEBUG=1
           export WP_INSTALL_CORE_TEST_SUITE=${{ matrix.install-core-tests }}
+
+          # install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-memcached>
+          bash install-wp-tests.sh wordpress_unit_tests root root localhost "$WP_VERSION" false true true
+          bash bin/test-script.sh
+      - name: "Run install-wp-tests.sh with WP_USE_SQLITE"
+        shell: bash
+        run: |
+          export INSTALL_WP_TEST_DEBUG=1
+          export WP_INSTALL_CORE_TEST_SUITE=${{ matrix.install-core-tests }}
+          export WP_USE_SQLITE=1
 
           # install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-memcached>
           bash install-wp-tests.sh wordpress_unit_tests root root localhost "$WP_VERSION" false true true
