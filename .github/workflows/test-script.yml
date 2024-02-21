@@ -11,8 +11,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        install-core-tests: ["true", "false"]
+        sqlite: ["true", "false"]
         wordpress: ["latest", "trunk", "6.0"]
-        install-core-tests: [0, 1]
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -22,10 +23,13 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    name: "Test Script ${{ matrix.wordpress }} - Core Suites: ${{ matrix.install-core-tests }}"
+    name: "Test Script ${{ matrix.wordpress }} - Core Suites: ${{ matrix.install-core-tests }} - SQLite: ${{ matrix.sqlite }}"
     env:
       WP_CORE_DIR: '/tmp/wordpress'
       WP_VERSION: ${{ matrix.wordpress }}
+      INSTALL_WP_TEST_DEBUG: 1
+      WP_INSTALL_CORE_TEST_SUITE: ${{ matrix.install-core-tests }}
+      WP_USE_SQLITE: ${{ matrix.sqlite }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -34,19 +38,6 @@ jobs:
       - name: "Run install-wp-tests.sh and check installation"
         shell: bash
         run: |
-          export INSTALL_WP_TEST_DEBUG=1
-          export WP_INSTALL_CORE_TEST_SUITE=${{ matrix.install-core-tests }}
-
-          # install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-memcached>
-          bash install-wp-tests.sh wordpress_unit_tests root root localhost "$WP_VERSION" false true true
-          bash bin/test-script.sh
-      - name: "Run install-wp-tests.sh with WP_USE_SQLITE"
-        shell: bash
-        run: |
-          export INSTALL_WP_TEST_DEBUG=1
-          export WP_INSTALL_CORE_TEST_SUITE=${{ matrix.install-core-tests }}
-          export WP_USE_SQLITE=1
-
           # install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-memcached>
           bash install-wp-tests.sh wordpress_unit_tests root root localhost "$WP_VERSION" false true true
           bash bin/test-script.sh
