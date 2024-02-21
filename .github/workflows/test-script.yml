@@ -41,3 +41,14 @@ jobs:
           # install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-memcached>
           bash install-wp-tests.sh wordpress_unit_tests root root localhost "$WP_VERSION" false true true
           bash bin/test-script.sh
+
+  check:
+    if: always()
+    needs: test
+    runs-on: ubuntu-latest
+    name: "Check if all tests passed"
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}
