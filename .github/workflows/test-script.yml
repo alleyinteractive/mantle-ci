@@ -46,7 +46,7 @@ jobs:
     if: always()
     needs: test
     runs-on: ubuntu-latest
-    name: "Check if all tests passed"
+    name: "Check if all the tests passed"
     steps:
       - name: Decide whether the needed jobs succeeded or failed
         uses: re-actors/alls-green@release/v1
