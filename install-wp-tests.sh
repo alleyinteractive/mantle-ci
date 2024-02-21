@@ -237,10 +237,24 @@ install_wp() {
 
   if [ "$WP_USE_SQLITE" == "true" ]; then
     if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
-      green "Installing SQLite db.php drop-in"
+      green "Installing sqlite-database-integration plugin"
     fi
 
-    download https://raw.githubusercontent.com/aaemnnosttv/wp-sqlite-db/1c52157e2e75693efc94fcd7a9ac36bf5d2f6012/src/db.php "$WP_CORE_DIR/wp-content/db.php"
+    download https://github.com/WordPress/sqlite-database-integration/archive/refs/heads/main.zip "$CACHEDIR/sqlite-database-integration-main.zip"
+
+    # Unzip the contents to the wp-content directory.
+    unzip -q "$CACHEDIR/sqlite-database-integration-main.zip" -d "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration"
+
+    # Copy the db.php file to the wp-content directory.
+    if [ -f "$WP_CORE_DIR/wp-content/db.php" ]; then
+      yellow "db.php already exists, skipping"
+    else
+      if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
+        green "Copying SQLite db.php drop-in"
+      fi
+
+      cp "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration/db.php" "$WP_CORE_DIR/wp-content/db.php"
+    fi
   else
     if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
       green "Installing mysqli db.php drop-in"
