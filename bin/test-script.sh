@@ -68,10 +68,18 @@ if ! grep -q "require_once ABSPATH . 'wp-content/vip-config/vip-config.php';" "$
   exit 1
 fi
 
-# Check if the database was created.
-if ! mysql -u root -proot -h 127.0.0.1 -e "use wordpress_unit_tests"; then
-  echo "Database wordpress_unit_tests does not exist."
-  exit 1
+# Check if the database was created if not using SQLite.
+if [ "$WP_USE_SQLITE" == "false" ]; then
+  if ! mysql -u root -proot -h 127.0.0.1 -e "use wordpress_unit_tests"; then
+    echo "Database wordpress_unit_tests does not exist."
+    exit 1
+  fi
+else
+  # Check if the SQLite plugin is installed.
+  if [ ! -f "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration/wp-includes/sqlite/db.php" ]; then
+    echo "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration/wp-includes/sqlite/db.php does not exist."
+    exit 1
+  fi
 fi
 
 # If WP_INSTALL_CORE_TEST_SUITE is set to 1 then we should check if the core

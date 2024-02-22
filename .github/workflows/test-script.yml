@@ -3,8 +3,6 @@ on:
     branches:
       - develop
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
 
 name: Test Script
 
@@ -13,21 +11,25 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        install-core-tests: ["true", "false"]
+        sqlite: ["true", "false"]
         wordpress: ["latest", "trunk", "6.0"]
-        install-core-tests: [0, 1]
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mysql:5.7
+        image: mysql:8.0
         env:
           MYSQL_ROOT_PASSWORD: "root"
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-    name: "Test Script ${{ matrix.wordpress }} - Core Suites: ${{ matrix.install-core-tests }}"
+    name: "Test Script ${{ matrix.wordpress }} - Core Suites: ${{ matrix.install-core-tests }} - SQLite: ${{ matrix.sqlite }}"
     env:
       WP_CORE_DIR: '/tmp/wordpress'
       WP_VERSION: ${{ matrix.wordpress }}
+      INSTALL_WP_TEST_DEBUG: 1
+      WP_INSTALL_CORE_TEST_SUITE: ${{ matrix.install-core-tests }}
+      WP_USE_SQLITE: ${{ matrix.sqlite }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,9 +38,17 @@ jobs:
       - name: "Run install-wp-tests.sh and check installation"
         shell: bash
         run: |
-          export INSTALL_WP_TEST_DEBUG=1
-          export WP_INSTALL_CORE_TEST_SUITE=${{ matrix.install-core-tests }}
-
           # install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-memcached>
           bash install-wp-tests.sh wordpress_unit_tests root root localhost "$WP_VERSION" false true true
           bash bin/test-script.sh
+
+  check:
+    if: always()
+    needs: test
+    runs-on: ubuntu-latest
+    name: "Check if all the tests passed"
+    steps:
+      - name: Decide whether the needed jobs succeeded or failed
+        uses: re-actors/alls-green@release/v1
+        with:
+          jobs: ${{ toJSON(needs) }}

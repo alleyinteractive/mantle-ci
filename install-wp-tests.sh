@@ -149,9 +149,9 @@ download() {
   fi
 
   if command -v curl >/dev/null 2>&1; then
-    curl -f -s "$1" > "$2"
+    curl -f -s -L "$1" > "$2"
   elif command -v wget >/dev/null 2>&1; then
-    wget -nv -O "$2" "$1"
+    wget -nv --location -O "$2" "$1"
   else
     red "Could not find curl or wget"
     exit 1
@@ -237,10 +237,35 @@ install_wp() {
 
   if [ "$WP_USE_SQLITE" == "true" ]; then
     if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
-      green "Installing SQLite db.php drop-in"
+      green "Installing sqlite-database-integration plugin"
     fi
 
-    download https://raw.githubusercontent.com/aaemnnosttv/wp-sqlite-db/1c52157e2e75693efc94fcd7a9ac36bf5d2f6012/src/db.php "$WP_CORE_DIR/wp-content/db.php"
+    download "https://github.com/WordPress/sqlite-database-integration/archive/refs/heads/main.zip" "$CACHEDIR/sqlite-database-integration-main.zip"
+
+    unzip -q "$CACHEDIR/sqlite-database-integration-main.zip" -d "$WP_CORE_DIR/wp-content/plugins"
+
+    if [ -d "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration-main" ]; then
+      if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
+        yellow "Renaming sqlite-database-integration-main to sqlite-database-integration"
+      fi
+
+      mv "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration-main" "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration"
+    fi
+
+    # Copy the db.php file to the wp-content directory.
+    if [ -f "$WP_CORE_DIR/wp-content/db.php" ]; then
+      yellow "db.php already exists, skipping"
+    else
+      if [ -f "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration/db.copy" ]; then
+        if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
+          green "Copying SQLite db.php drop-in"
+        fi
+
+        cp "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration/db.copy" "$WP_CORE_DIR/wp-content/db.php"
+      else
+        red "SQLite db.php drop-in not found at [$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration/db.copy]"
+      fi
+    fi
   else
     if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
       green "Installing mysqli db.php drop-in"
