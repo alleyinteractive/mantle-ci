@@ -14,6 +14,7 @@ jobs:
         install-core-tests: ["true", "false"]
         sqlite: ["true", "false"]
         wordpress: ["latest", "trunk", "6.0"]
+        object: ["true", "memcached", "redis"]
     runs-on: ubuntu-latest
     services:
       mysql:
@@ -38,8 +39,8 @@ jobs:
       - name: "Run install-wp-tests.sh and check installation"
         shell: bash
         run: |
-          # install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-memcached>
-          bash install-wp-tests.sh wordpress_unit_tests root root localhost "$WP_VERSION" false true true
+          # install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-object-cache>
+          bash install-wp-tests.sh wordpress_unit_tests root root localhost "$WP_VERSION" false true ${{ matrix.object }}
           bash bin/test-script.sh
 
   check:
