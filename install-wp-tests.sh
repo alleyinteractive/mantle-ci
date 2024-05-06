@@ -85,6 +85,17 @@ function boolean() {
   fi
 }
 
+# Handle string values
+function string() {
+  if [[ "$1" =~ ^(true|yes|on|1)$ ]]; then
+    echo "true"
+  elif [[ "$1" =~ ^(false|no|off|0)$ ]]; then
+    echo "false"
+  else
+    echo "$1"
+  fi
+}
+
 # Arguments passed to the script directly with defaults.
 DB_NAME="${1:-wordpress_unit_tests}"
 DB_USER="${2:-root}"
@@ -93,7 +104,7 @@ DB_HOST="${4:-localhost}"
 WP_VERSION="${5:-latest}"
 SKIP_DB_CREATE=$(boolean "${6:-false}" "SKIP_DB_CREATE")
 INSTALL_VIP_MU_PLUGINS=$(boolean "${7:-false}" "INSTALL_VIP_MU_PLUGINS")
-INSTALL_OBJECT_CACHE=$("${8:-false}" "INSTALL_OBJECT_CACHE")
+INSTALL_OBJECT_CACHE=$(string "${8:-false}" "INSTALL_OBJECT_CACHE")
 
 # Environment variables with defaults.
 CACHEDIR=${CACHEDIR:-/tmp}
