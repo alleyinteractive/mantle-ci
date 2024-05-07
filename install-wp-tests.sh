@@ -13,14 +13,13 @@ set -e
 # 2. It will attempt to cache remote data requests for 4 hours. This can be
 #    configured by the `CACHEDIR` environment variable for the location of the cache
 #    directory. It can also be disabled by setting `CACHEDIR` to false.
-# 3. The script can optionally install Automattic's vip-mu-plugins-built as well as the
-#    object-cache.php file for Memcached support. This can be configured by passing
-#    the `<install-vip-mu-plugins>` and `<install-memcached>` arguments to the command
-#    with both disabled by default.
+# 3. The script can optionally install Automattic's vip-mu-plugins-built. Defaults to false.
+# 4. The script can optionally install the `object-cache.php` file for Memcached or Redis. This can be configured by passing
+#    the `<install-object-cache>` argument to the command. Valid values are `true` (memcached), memcached, or redis.
 #
 # Usage:
 #
-# 	install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-memcached>
+# 	install-wp-tests.sh <db-name> <db-user> <db-pass> <db-host> <wp-version> <skip-database-creation> <install-vip-mu-plugins> <install-object-cache>
 #
 # Arguments (all are optional but must be in order and cannot be skipped):
 #
@@ -31,7 +30,7 @@ set -e
 # 	5. WordPress Version: defaults to "latest"
 # 	6. Skip Database Creation: defaults to false
 # 	7. Install WordPress VIP's `Automattic/vip-go-mu-plugins-built` project to the `mu-plugins` directory: defaults to false
-# 	8. Install Memcached: defaults to false
+# 	8. Install Object Cache: defaults to false (valid values are `true` (memcached), memcached, or redis)
 #
 # Environment Variables:
 #
@@ -50,6 +49,8 @@ set -e
 # 	WP_USE_SQLITE: Whether or not to use SQLite for the database.
 # 		Defaults to false.
 # 	INSTALL_WP_TEST_DEBUG: Whether or not to dump all variables for debugging.
+# 		Defaults to false.
+# 	INSTALL_OBJECT_CACHE: Whether or not to install the object-cache.php file.
 # 		Defaults to false.
 #
 # Example:
@@ -84,6 +85,17 @@ function boolean() {
   fi
 }
 
+# Handle string values
+function string() {
+  if [[ "$1" =~ ^(true|yes|on|1)$ ]]; then
+    echo "true"
+  elif [[ "$1" =~ ^(false|no|off|0)$ ]]; then
+    echo "false"
+  else
+    echo "$1"
+  fi
+}
+
 # Arguments passed to the script directly with defaults.
 DB_NAME="${1:-wordpress_unit_tests}"
 DB_USER="${2:-root}"
@@ -92,7 +104,7 @@ DB_HOST="${4:-localhost}"
 WP_VERSION="${5:-latest}"
 SKIP_DB_CREATE=$(boolean "${6:-false}" "SKIP_DB_CREATE")
 INSTALL_VIP_MU_PLUGINS=$(boolean "${7:-false}" "INSTALL_VIP_MU_PLUGINS")
-INSTALL_OBJECT_CACHE=$(boolean "${8:-false}" "INSTALL_OBJECT_CACHE")
+INSTALL_OBJECT_CACHE=$(string "${8:-false}" "INSTALL_OBJECT_CACHE")
 
 # Environment variables with defaults.
 CACHEDIR=${CACHEDIR:-/tmp}
@@ -440,7 +452,7 @@ install_vip_config() {
 }
 
 install_object_cache() {
-  if [ "$INSTALL_OBJECT_CACHE" != "true" ]; then
+  if [ "$INSTALL_OBJECT_CACHE" == "false" ]; then
     yellow "Skipping installing object-cache.php"
     return
   fi
@@ -451,14 +463,25 @@ install_object_cache() {
     return
   fi
 
-  # If we're installing mu-plugins, symlink the object-cache.php file from the
-  # mu-plugins installation. Otherwise, download it from wp-memcached.
-  if [ "$INSTALL_VIP_MU_PLUGINS" == "true" ] || [ -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" ]; then
-    green "Symlinking object-cache.php from VIP Go mu-plugins"
-    ln -s "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
-  else
-    green "Downloading object-cache.php from wp-memcached"
-    download "https://raw.githubusercontent.com/Automattic/wp-memcached/HEAD/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+  # Install the object-cache.php file for Memcached.
+  if [ "$INSTALL_OBJECT_CACHE" == "true" ] || [ "$INSTALL_OBJECT_CACHE" == "memcached" ]; then
+    # If we're installing mu-plugins, symlink the object-cache.php file from the
+    # mu-plugins installation. Otherwise, download it from wp-memcached.
+    if [ "$INSTALL_VIP_MU_PLUGINS" == "true" ] || [ -f "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" ]; then
+      green "Symlinking object-cache.php from VIP Go mu-plugins"
+      ln -s "${WP_CORE_DIR}/wp-content/mu-plugins/drop-ins/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+    else
+      green "Downloading object-cache.php from wp-memcached"
+      download "https://raw.githubusercontent.com/Automattic/wp-memcached/HEAD/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+    fi
+    return
+  fi
+
+  # Install the object-cache.php file for Redis.
+  if [ "$INSTALL_OBJECT_CACHE" == "redis" ]; then
+    green "Downloading object-cache.php from wp-redis"
+    download "https://raw.githubusercontent.com/pantheon-systems/wp-redis/HEAD/object-cache.php" "${WP_CORE_DIR}/wp-content/object-cache.php"
+    return
   fi
 }
 
