@@ -39,7 +39,7 @@ set -e
 # 	WP_CORE_DIR: The location of the WordPress core directory.
 # 		Defaults to /tmp/wordpress.
 # 	WP_TESTS_DIR: The location of the WordPress core test suite directory.
-# 		Defaults to /tmp/wordpress-tests-lib. Not used if INSTALL_CORE_TEST_SUITE is not true.
+# 		Defaults to /tmp/wordpress-tests-lib. Not used if WP_INSTALL_CORE_TEST_SUITE is not true.
 # 	WP_MULTISITE: Whether or not to install WordPress as multisite.
 # 		Defaults to false.
 # 	WP_INSTALL_CORE_TEST_SUITE: Whether or not to install the WordPress core test suite.
