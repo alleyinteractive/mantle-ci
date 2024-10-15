@@ -339,7 +339,7 @@ install_test_suite() {
   fi
 
   if [ ! -f wp-tests-config.php ]; then
-    cp /tmp/wordpress-develop-github/wp-tests-config-sample.php "$WP_TESTS_DIR"
+    cp /tmp/wordpress-develop-github/wp-tests-config-sample.php "$WP_TESTS_DIR/wp-tests-config.php"
 
     # Remove the trailing forward slash
     # shellcheck disable=SC2001
