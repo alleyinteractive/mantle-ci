@@ -180,13 +180,13 @@ download() {
 # Determine the WordPress core test tag to install and the latest version of
 # WordPress that can be installed.
 if [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
-  WP_TESTS_TAG="branches/$WP_VERSION"
+  WP_TESTS_TAG="$WP_VERSION"
 elif [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
   if [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0] ]]; then
     # version x.x.0 means the first release of the major version, so strip off the .0 and download version x.x
-    WP_TESTS_TAG="tags/${WP_VERSION%??}"
+    WP_TESTS_TAG="${WP_VERSION%??}"
   else
-    WP_TESTS_TAG="tags/$WP_VERSION"
+    WP_TESTS_TAG="$WP_VERSION"
   fi
 elif [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
   WP_TESTS_TAG="trunk"
@@ -200,7 +200,7 @@ else
     echo "Latest WordPress version could not be found"
     exit 1
   fi
-  WP_TESTS_TAG="tags/$LATEST_VERSION"
+  WP_TESTS_TAG="$LATEST_VERSION"
 fi
 
 install_wp() {
