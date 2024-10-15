@@ -180,13 +180,13 @@ download() {
 # Determine the WordPress core test tag to install and the latest version of
 # WordPress that can be installed.
 if [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
-  WP_TESTS_TAG="branches/$WP_VERSION"
+  WP_TESTS_TAG="$WP_VERSION"
 elif [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0-9]+ ]]; then
   if [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0] ]]; then
     # version x.x.0 means the first release of the major version, so strip off the .0 and download version x.x
-    WP_TESTS_TAG="tags/${WP_VERSION%??}"
+    WP_TESTS_TAG="${WP_VERSION%??}"
   else
-    WP_TESTS_TAG="tags/$WP_VERSION"
+    WP_TESTS_TAG="$WP_VERSION"
   fi
 elif [[ $WP_VERSION == 'nightly' || $WP_VERSION == 'trunk' ]]; then
   WP_TESTS_TAG="trunk"
@@ -200,7 +200,7 @@ else
     echo "Latest WordPress version could not be found"
     exit 1
   fi
-  WP_TESTS_TAG="tags/$LATEST_VERSION"
+  WP_TESTS_TAG="$LATEST_VERSION"
 fi
 
 install_wp() {
@@ -327,16 +327,19 @@ install_test_suite() {
     local ioption='-i'
   fi
 
+  # Grab a copy of wordpress-develop with the requested branch or tag.
+  git clone --depth=1 --quiet --branch="$WP_TESTS_TAG" https://github.com/wordpress/wordpress-develop /tmp/wordpress-develop-github
+
   # set up testing suite if it doesn't yet exist
   if [ ! -d "$WP_TESTS_DIR" ]; then
     # set up testing suite
     mkdir -p "$WP_TESTS_DIR"
-    svn co --quiet "https://develop.svn.wordpress.org/$WP_TESTS_TAG/tests/phpunit/includes/" "$WP_TESTS_DIR/includes"
-    svn co --quiet "https://develop.svn.wordpress.org/$WP_TESTS_TAG/tests/phpunit/data/" "$WP_TESTS_DIR/data"
+    cp -r /tmp/wordpress-develop-github/tests/phpunit/includes "$WP_TESTS_DIR"
+    cp -r /tmp/wordpress-develop-github/tests/phpunit/data "$WP_TESTS_DIR"
   fi
 
   if [ ! -f wp-tests-config.php ]; then
-    download "https://develop.svn.wordpress.org/$WP_TESTS_TAG/wp-tests-config-sample.php" "$WP_TESTS_DIR"/wp-tests-config.php
+    cp /tmp/wordpress-develop-github/wp-tests-config-sample.php "$WP_TESTS_DIR/wp-tests-config.php"
 
     # Remove the trailing forward slash
     # shellcheck disable=SC2001
