@@ -1,4 +1,18 @@
 <?php
+/**
+ *  __  __             _   _        ____ ___
+ * |  \/  | __ _ _ __ | |_| | ___  / ___|_ _|
+ * | |\/| |/ _` | '_ \| __| |/ _ \| |    | |
+ * | |  | | (_| | | | | |_| |  __/| |___ | |
+ * |_|  |_|\__,_|_| |_|\__|_|\___| \____|___|
+ *
+ * mantle-ci WordPress Testing Configuration File
+ *
+ * This file is used by install-wp-tests.sh as the base wp-tests-config.php for
+ * WordPress unit tests.
+ *
+ * @link https://mantle.alley.com/docs/testing/installation-manager
+ */
 
 /* Path to the WordPress codebase you'd like to test. Add a forward slash in the end. */
 defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/' );
@@ -6,10 +20,15 @@ defined( 'ABSPATH' ) || define( 'ABSPATH', __DIR__ . '/' );
 /*
  * Path to the theme to test with.
  *
- * The 'default' theme is symlinked from test/phpunit/data/themedir1/default into
- * the themes directory of the WordPress installation defined above.
+ * This is an environment variable to ensure it is properly passed to the
+ * installation subprocess. The constant WP_DEFAULT_THEME is used as a default
+ * but is not encouraged.
+ *
+ * @link https://mantle.alley.com/docs/testing/installation-manager#changing-the-active-theme
  */
-defined( 'WP_DEFAULT_THEME' ) || define( 'WP_DEFAULT_THEME', 'default' );
+if ( ! getenv( 'WP_DEFAULT_THEME' ) ) {
+  putenv( 'WP_DEFAULT_THEME=' . ( defined( 'WP_DEFAULT_THEME' ) ? WP_DEFAULT_THEME : 'default' ) );
+}
 
 /*
  * Test with multisite enabled.
