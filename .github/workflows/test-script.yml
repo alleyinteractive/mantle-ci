@@ -33,7 +33,7 @@ jobs:
       WP_USE_SQLITE: ${{ matrix.sqlite }}
     steps:
       - name: Checkout code
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0
       - name: "Run install-wp-tests.sh and check installation"
