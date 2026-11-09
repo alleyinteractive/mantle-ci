@@ -252,17 +252,11 @@ install_wp() {
       green "Installing sqlite-database-integration plugin"
     fi
 
-    download "https://github.com/WordPress/sqlite-database-integration/archive/refs/heads/main.zip" "$CACHEDIR/sqlite-database-integration-main.zip"
+    # Install the latest stable release from WordPress.org. The archive extracts
+    # directly to the sqlite-database-integration directory.
+    download "https://downloads.wordpress.org/plugin/sqlite-database-integration.latest-stable.zip" "$CACHEDIR/sqlite-database-integration.zip"
 
-    unzip -q "$CACHEDIR/sqlite-database-integration-main.zip" -d "$WP_CORE_DIR/wp-content/plugins"
-
-    if [ -d "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration-main" ]; then
-      if [ "$INSTALL_WP_TEST_DEBUG" = "true" ]; then
-        yellow "Renaming sqlite-database-integration-main to sqlite-database-integration"
-      fi
-
-      mv "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration-main" "$WP_CORE_DIR/wp-content/plugins/sqlite-database-integration"
-    fi
+    unzip -q "$CACHEDIR/sqlite-database-integration.zip" -d "$WP_CORE_DIR/wp-content/plugins"
 
     # Copy the db.php file to the wp-content directory.
     if [ -f "$WP_CORE_DIR/wp-content/db.php" ]; then
