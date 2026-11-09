@@ -27,7 +27,8 @@ set -e
 # 	2. Database User: defaults to "root"
 # 	3. Database Password: defaults to ""
 # 	4. Database Host: defaults to "localhost"
-# 	5. WordPress Version: defaults to "latest"
+# 	5. WordPress Version: defaults to "latest". Also accepts "nightly"/"trunk", a branch such as "6.8" (installs
+# 	   the latest release of that branch) or an exact version such as "6.8.1"
 # 	6. Skip Database Creation: defaults to false
 # 	7. Install WordPress VIP's `Automattic/vip-go-mu-plugins-built` project to the `mu-plugins` directory: defaults to false
 # 	8. Install Object Cache: defaults to false (valid values are `true` (memcached), memcached, or redis)
@@ -223,23 +224,21 @@ install_wp() {
   else
     if [ "$WP_VERSION" == 'latest' ]; then
       ARCHIVE_NAME='latest'
-    elif [[ $WP_VERSION =~ [0-9]+\.[0-9]+ ]]; then
-      # https serves multiple offers, whereas http serves single.
-      download "https://api.wordpress.org/core/version-check/1.7/" "$CACHEDIR/wp-latest.json"
-      if [[ $WP_VERSION =~ [0-9]+\.[0-9]+\.[0] ]]; then
-        # version x.x.0 means the first release of the major version, so strip off the .0 and download version x.x
-        LATEST_VERSION=${WP_VERSION%??}
-      else
-        # otherwise, scan the releases and get the most up to date minor version of the major release
-        # shellcheck disable=SC2001
-        VERSION_ESCAPED=$(echo "$WP_VERSION" | sed 's/\./\\\\./g')
-        LATEST_VERSION=$(grep -o '"version":"'"$VERSION_ESCAPED"'[^"]*' "$CACHEDIR/wp-latest.json" | sed 's/"version":"//' | head -1)
-      fi
+    elif [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+$ ]]; then
+      # version x.x is a branch: scan the releases and get the most up to date minor version of the major release.
+      # https serves multiple offers (one per branch), whereas http serves single.
+      # Not cached as wp-latest.json, which holds the single offer downloaded for "latest".
+      download "https://api.wordpress.org/core/version-check/1.7/" "$CACHEDIR/wp-versions.json"
+      LATEST_VERSION=$(grep -o '"version":"[^"]*' "$CACHEDIR/wp-versions.json" | sed 's/"version":"//' | grep -E "^${WP_VERSION/./\\.}(\.[0-9]+)?$" | head -1)
       if [[ -z "$LATEST_VERSION" ]]; then
+        yellow "Could not find the latest release of WordPress $WP_VERSION, installing $WP_VERSION"
         ARCHIVE_NAME="wordpress-$WP_VERSION"
       else
         ARCHIVE_NAME="wordpress-$LATEST_VERSION"
       fi
+    elif [[ $WP_VERSION =~ ^[0-9]+\.[0-9]+\.0$ ]]; then
+      # version x.x.0 means the first release of the major version, so strip off the .0 and download version x.x
+      ARCHIVE_NAME="wordpress-${WP_VERSION%.0}"
     else
       ARCHIVE_NAME="wordpress-$WP_VERSION"
     fi
